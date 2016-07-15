@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.eje_c.reastream.MainActivity">
+
+    <TextView
+        android:id="@+id/label_identifier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/input_identifier"
+        android:text="Identifier:"/>
+
+    <EditText
+        android:id="@+id/input_identifier"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/label_identifier"
+        android:inputType="text"
+        android:maxLines="1"
+        android:text="default"/>
+
+    <CheckBox
+        android:id="@+id/check_enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/input_identifier"
+        android:checked="true"
+        android:hint="Enabled"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/label_identifier"
+        android:layout_marginTop="16dp">
+
+        <RadioButton
+            android:id="@+id/radio_mode_receive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:hint="Receive audio"/>
+
+        <RadioButton
+            android:id="@+id/radio_mode_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Send audio"/>
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/input_remoteAddress"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/radioGroup_mode"
+        android:hint="Remote address"
+        android:maxLines="1"/>
+
+</RelativeLayout>

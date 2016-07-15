@@ -1,0 +1,37 @@
+from http://www.1014.org/shiz/reastream.txt
+
+ReaStream format:
+
+UDP port 58710
+
+
+all ints are little endian
+
+audio blocks:
+4 bytes: 'M', 'R', 'S', 'R'
+4 bytes: int packetsize: 4+4+32+1+4+2+sblocklen
+32 bytes: identifier string (zero padded, last byte always 0)
+1 byte: char nch [1-64]
+4 bytes: int samplerate
+2 bytes: short sblocklen -- largest supported is 1200 (larger blocks are separated)
+sblocklen bytes: sample data (32 bit floats, non-interleaved)
+
+
+midi blocks:
+4 bytes: 'm', 'R', 'S', 'R'
+4 bytes: int packetsize: 4+4+32+eventlistsize
+32 bytes: identifier string (zero padded, last byte always 0)
+packetsize-4-4-32 bytes: events
+  each event:
+     4 bytes: int type (1 = MIDI, ignore message otherwise)
+     4 bytes: int bytesize (includes type and bytesize)
+     4 bytes: int sample frames since last event
+     4 bytes: int flags (see vst spec)
+     4 bytes: int noteLength (see vst spec)
+     4 bytes: int noteOffset (see vst spec)
+     3 bytes: MIDI data
+     1 byte: zero reserved
+     1 byte: detune
+     1 bytes: noteOffVelocity
+
+NOTE: sysex is not currently supported (but we will add it at some point)
