@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.eje_c.reastream"
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
