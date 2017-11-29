@@ -110,6 +110,17 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
+
+        // Show MIDI events
+        reaStream.onMidiEvents = { midiEvents ->
+
+            // This callback is called in background thread.
+            // UI update must be in main thread.
+
+            runOnUiThread {
+                this.midiEvents.text = midiEvents.map { ev -> ev.toString() }.joinToString()
+            }
+        }
     }
 
     override fun onDestroy() {

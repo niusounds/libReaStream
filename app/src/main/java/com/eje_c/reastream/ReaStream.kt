@@ -1,14 +1,10 @@
 package com.eje_c.reastream
 
 import android.annotation.SuppressLint
-import com.eje_c.libreastream.AudioRecordSrc
-import com.eje_c.libreastream.AudioTrackSink
-import com.eje_c.libreastream.ReaStreamReceiver
-import com.eje_c.libreastream.ReaStreamSender
+import com.eje_c.libreastream.*
 import java.io.IOException
 import java.net.InetAddress
 import java.net.UnknownHostException
-import java.util.*
 
 class ReaStream(val sampleRate: Int = 44100) : AutoCloseable {
 
@@ -19,6 +15,8 @@ class ReaStream(val sampleRate: Int = 44100) : AutoCloseable {
         private set
 
     var isEnabled = true
+
+    var onMidiEvents: ((Array<MidiEvent>) -> Unit)? = null
 
     private var sender: ReaStreamSender? = null     // Non null while sending
     private var receiver: ReaStreamReceiver? = null // Non null while receiving
@@ -146,8 +144,7 @@ class ReaStream(val sampleRate: Int = 44100) : AutoCloseable {
                                 if (packet.isAudioData) {
                                     audioTrackSink.onReceive(packet)
                                 } else if (packet.isMidiData) {
-                                    // TODO
-                                    println(Arrays.toString(packet.midiEvents))
+                                    onMidiEvents?.invoke(packet.midiEvents!!)
                                 }
                             }
                         }
