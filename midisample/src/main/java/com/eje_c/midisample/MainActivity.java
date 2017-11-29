@@ -9,7 +9,6 @@ import com.eje_c.libreastream.ReaStreamSender;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 
 public class MainActivity extends Activity {
     private ReaStreamSender sender;
@@ -19,11 +18,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
-            sender = new ReaStreamSender();
-        } catch (SocketException e) {
-            throw new RuntimeException("Cannot create ReaStreamSender", e);
-        }
+        sender = new ReaStreamSender();
     }
 
     @Override
