@@ -8,6 +8,9 @@ import java.nio.channels.DatagramChannel
 
 /**
  * Low-level [ReaStreamPacket] sender.
+ * @param remote Remote address for sending data. Default value is broadcast address for current network with [ReaStream.DEFAULT_PORT].
+ * @param channel Pre-created [DatagramChannel] for reuse channel. If [close] is called, this channel is also closed.
+ * @param identifier Identifier string. Max 32 bytes. Default value is "default".
  */
 class ReaStreamSender(
         val remote: SocketAddress = InetSocketAddress(getBroadcastAddress().firstOrNull(), ReaStream.DEFAULT_PORT),

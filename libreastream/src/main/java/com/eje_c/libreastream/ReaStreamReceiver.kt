@@ -9,6 +9,10 @@ import java.nio.channels.DatagramChannel
 
 /**
  * Low-level [ReaStreamPacket] receiver.
+ *
+ * @param channel Pre-created [DatagramChannel] for reuse channel. If [close] is called, this channel is also closed.
+ * @param identifier Identifier string. Max 32 bytes. Default value is "default".
+ * @param port Waiting port number. Default value is [ReaStream.DEFAULT_PORT] which is used by original ReaStream plugin.
  */
 class ReaStreamReceiver(
         private val channel: DatagramChannel = DatagramChannel.open(),
