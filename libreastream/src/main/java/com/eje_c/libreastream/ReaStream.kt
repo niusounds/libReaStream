@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
  * @param port Port number for waiting remote packet and sending to remote.
  */
 class ReaStream(
-        val sampleRate: Int = 44100,
+        val sampleRate: Int = DEFAULT_SAMPLE_RATE,
         val identifier: String = DEFAULT_IDENTIFIER,
         val port: Int = DEFAULT_PORT) : AutoCloseable {
 
@@ -159,6 +159,7 @@ class ReaStream(
     }
 
     companion object {
+        const val DEFAULT_SAMPLE_RATE = 44100
         const val DEFAULT_PORT = 58710
         const val DEFAULT_IDENTIFIER = "default"
     }

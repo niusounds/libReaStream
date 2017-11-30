@@ -1,6 +1,6 @@
 package com.eje_c.libreastream
 
-class AudioTrackSink(sampleRate: Int) : AutoCloseable, ReaStreamReceiverService.OnReaStreamPacketListener {
+class AudioTrackSink(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable, OnReaStreamPacketListener {
 
     private val track = AudioTrack(sampleRate)
     private var convertedSamples: FloatArray? = null
