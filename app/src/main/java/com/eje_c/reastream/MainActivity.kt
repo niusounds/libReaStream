@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import com.eje_c.libreastream.ReaStream
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.UnknownHostException
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var reaStream: ReaStream
+    private var reaStream: ReaStream = ReaStream()
     private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Init lateinit fields
-        reaStream = ReaStream()
         prefs = getSharedPreferences("app_status", Context.MODE_PRIVATE)
 
         // Watch identifier text field
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString("identifier", newVal).apply()
 
                 // Set identifier
-                reaStream.setIdentifier(newVal)
+                updateReaStream(identifier = newVal)
             }
         })
 
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         val defaultIdentifier = prefs.getString("identifier", null)
         if (defaultIdentifier != null) {
             identifier.setText(defaultIdentifier)
-            reaStream.setIdentifier(defaultIdentifier)
+            updateReaStream(identifier = defaultIdentifier)
         }
 
         // Switch ReaStream mode
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                         reaStream.stopSending()
                     }
                     if (!reaStream.isReceiving) {
-                        reaStream.startReveiving()
+                        reaStream.startReceiving()
                     }
                 }
                 R.id.radio_mode_send -> {
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         enabled.setOnCheckedChangeListener { _, isChecked -> reaStream.isEnabled = isChecked }
 
         // Default is receiving mode
-        reaStream.startReveiving()
+        reaStream.startReceiving()
 
         // Watch remote address text field
         remoteAddress.addTextChangedListener(object : TextWatcher {
@@ -120,6 +120,31 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 this.midiEvents.text = midiEvents.map { ev -> ev.toString() }.joinToString()
             }
+        }
+    }
+
+    private fun updateReaStream(identifier: String = reaStream.identifier) {
+
+        // Original state
+        val receiving = reaStream.isReceiving
+        val sending = reaStream.isSending
+        val remoteAddress = reaStream.remoteAddress
+
+        // Close current session
+        reaStream.close()
+
+        // Create new instance
+        reaStream = ReaStream(identifier = identifier)
+
+        // Restore previous state
+        reaStream.remoteAddress = remoteAddress
+
+        if (receiving) {
+            reaStream.startReceiving()
+        }
+
+        if (sending) {
+            reaStream.startSending()
         }
     }
 

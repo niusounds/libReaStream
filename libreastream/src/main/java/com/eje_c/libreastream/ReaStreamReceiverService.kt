@@ -26,12 +26,9 @@ class ReaStreamReceiverService : Service() {
 
     private val receiverTask = {
         try {
-            ReaStreamReceiver().use { receiver ->
+            ReaStreamReceiver(identifier = identifier ?: ReaStream.DEFAULT_IDENTIFIER).use { receiver ->
                 this@ReaStreamReceiverService.receiver = receiver
 
-                if (identifier != null) {
-                    receiver.identifier = identifier!!
-                }
                 receiver.setTimeout(timeout)
 
                 while (!Thread.interrupted()) {
@@ -81,7 +78,6 @@ class ReaStreamReceiverService : Service() {
 
     fun setIdentifier(identifier: String) {
         this.identifier = identifier
-        receiver?.identifier = identifier
     }
 
     @Throws(SocketException::class)

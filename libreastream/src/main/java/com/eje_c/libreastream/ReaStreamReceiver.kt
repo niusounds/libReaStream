@@ -7,9 +7,13 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.DatagramChannel
 
+/**
+ * Low-level [ReaStreamPacket] receiver.
+ */
 class ReaStreamReceiver(
-        private val socket: DatagramChannel = DatagramChannel.open(),
-        port: Int = DEFAULT_PORT) : AutoCloseable {
+        private val channel: DatagramChannel = DatagramChannel.open(),
+        val identifier: String = ReaStream.DEFAULT_IDENTIFIER,
+        port: Int = ReaStream.DEFAULT_PORT) : AutoCloseable {
 
     private val reaStreamPacket = ReaStreamPacket()
     private val buffer: ByteBuffer = ByteBuffer.allocate(ReaStreamPacket.MAX_BLOCK_LENGTH + ReaStreamPacket.AUDIO_PACKET_HEADER_BYTE_SIZE)
@@ -17,10 +21,8 @@ class ReaStreamReceiver(
                 order(ByteOrder.LITTLE_ENDIAN)
             }
 
-    var identifier = DEFAULT_IDENTIFIER
-
     init {
-        socket.socket().bind(InetSocketAddress(port))
+        channel.socket().bind(InetSocketAddress(port))
     }
 
     /**
@@ -35,7 +37,7 @@ class ReaStreamReceiver(
 
         do {
             buffer.clear()
-            socket.receive(buffer)
+            channel.receive(buffer)
             reaStreamPacket.readFromBuffer(buffer)
         } while (identifier != reaStreamPacket.getIdentifier())
 
@@ -43,8 +45,8 @@ class ReaStreamReceiver(
     }
 
     /**
-     * Sets the read timeout in milliseconds for this socket.
-     * This receive timeout defines the period the socket will block waiting to
+     * Sets the read timeout in milliseconds for this channel.
+     * This receive timeout defines the period the channel will block waiting to
      * receive data before throwing an `InterruptedIOException`. The value
      * `0` (default) is used to set an infinite timeout. To have effect
      * this option must be set before the blocking method was called.
@@ -54,18 +56,13 @@ class ReaStreamReceiver(
      */
     @Throws(SocketException::class)
     fun setTimeout(timeout: Int) {
-        socket.socket().soTimeout = timeout
+        channel.socket().soTimeout = timeout
     }
 
     /**
-     * Close UDP socket.
+     * Close UDP channel.
      */
     override fun close() {
-        socket.close()
-    }
-
-    companion object {
-        const val DEFAULT_PORT = 58710
-        const val DEFAULT_IDENTIFIER = "default"
+        channel.close()
     }
 }

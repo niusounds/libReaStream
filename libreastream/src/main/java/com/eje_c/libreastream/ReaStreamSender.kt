@@ -1,22 +1,20 @@
 package com.eje_c.libreastream
 
 import java.io.IOException
-import java.net.InetAddress
-import java.net.InetSocketAddress
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 
-class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.open()) : AutoCloseable {
+/**
+ * Low-level [ReaStreamPacket] sender.
+ */
+class ReaStreamSender(
+        val remote: SocketAddress,
+        private val channel: DatagramChannel = DatagramChannel.open(),
+        val identifier: String = ReaStream.DEFAULT_IDENTIFIER) : AutoCloseable {
 
     private var buffer: ByteBuffer? = null
     private val reaStreamPacket = ReaStreamPacket()
-
-    /**
-     * Identifier for ReaStream packet. Audio/MIDI data is ignored if both identifier is not same.
-     */
-    var identifier: String
-        get() = reaStreamPacket.getIdentifier()
-        set(value) = reaStreamPacket.setIdentifier(value)
 
     /**
      * Sample rate of audio data.
@@ -36,31 +34,8 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
             reaStreamPacket.channels = value
         }
 
-    /**
-     * Remote address. Default value is local broadcast address.
-     */
-    var remote: InetSocketAddress = InetSocketAddress(getBroadcastAddress().firstOrNull(), DEFAULT_PORT)
-
-    /**
-     * For compatibility from previous version. Use [remote].
-     */
-    var remoteAddress: InetAddress
-        get() = remote.address
-        set(value) {
-            remote = InetSocketAddress(value, remote.port)
-        }
-
-    /**
-     * For compatibility from previous version. Use [remote].
-     */
-    var port: Int
-        get() = remote.port
-        set(value) {
-            remote = InetSocketAddress(remote.address, port)
-        }
-
     init {
-        identifier = DEFAULT_IDENTIFIER
+        reaStreamPacket.setIdentifier(identifier)
 
         // Use async mode
         channel.configureBlocking(false)
@@ -123,10 +98,5 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
      */
     override fun close() {
         channel.close()
-    }
-
-    companion object {
-        const val DEFAULT_PORT = 58710
-        const val DEFAULT_IDENTIFIER = "default"
     }
 }
