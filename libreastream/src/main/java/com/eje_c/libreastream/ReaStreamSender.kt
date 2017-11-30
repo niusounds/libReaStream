@@ -5,7 +5,6 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
-import java.util.*
 
 class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.open()) : AutoCloseable {
 
@@ -62,6 +61,9 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
 
     init {
         identifier = DEFAULT_IDENTIFIER
+
+        // Use async mode
+        channel.configureBlocking(false)
     }
 
     /**
@@ -69,9 +71,7 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
      *
      * @param audioData Audio data
      * @param readCount Must be less than or equal to audioData.length
-     * @throws IOException
      */
-    @Throws(IOException::class)
     fun send(audioData: FloatArray, readCount: Int) {
 
         var offset = 0
@@ -84,7 +84,7 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
             if (remaining <= 0) break
 
             val length = Math.min(remaining, ReaStreamPacket.MAX_BLOCK_LENGTH / ReaStreamPacket.PER_SAMPLE_BYTES)
-            val part = Arrays.copyOfRange(audioData, offset, offset + length)
+            val part = audioData.copyOfRange(offset, offset + length)
 
             reaStreamPacket.setAudioData(part, length)
             prepareAndSendPacket()
@@ -99,13 +99,11 @@ class ReaStreamSender(private val channel: DatagramChannel = DatagramChannel.ope
      * @param midiEvents Midi data
      * @throws IOException
      */
-    @Throws(IOException::class)
     fun send(vararg midiEvents: MidiEvent) {
         reaStreamPacket.setMidiData(*midiEvents)
         prepareAndSendPacket()
     }
 
-    @Throws(IOException::class)
     private fun prepareAndSendPacket() {
 
         // Create buffer
