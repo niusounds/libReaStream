@@ -8,18 +8,40 @@ import java.nio.ByteOrder
  */
 class ReaStreamPacket {
 
+    /**
+     * Total packet size.
+     */
     @JvmField
     var packetSize: Int = 0
 
-    // audio data
+    /**
+     * Identifier raw bytes.
+     */
     @JvmField
     val identifier = ByteArray(32)
+
+    // audio data
+    /**
+     * Audio channels.
+     */
     @JvmField
     var channels: Byte = 1
+
+    /**
+     * Audio sample rate.
+     */
     @JvmField
     var sampleRate = 44100
+
+    /**
+     * Audio data block length.
+     */
     @JvmField
     var blockLength: Short = 0
+
+    /**
+     * Audio data.
+     */
     @JvmField
     var audioData: FloatArray? = null
 
@@ -27,9 +49,15 @@ class ReaStreamPacket {
     @JvmField
     var midiEvents: Array<MidiEvent>? = null
 
+    /**
+     * If true, [channels],[sampleRate],[blockLength],[audioData] can be accessible.
+     */
     val isAudioData: Boolean
         get() = audioData != null
 
+    /**
+     * If true, [midiEvents] can be accessible.
+     */
     val isMidiData: Boolean
         get() = midiEvents != null
 
@@ -215,14 +243,14 @@ class ReaStreamPacket {
 
     /**
      * @param buffer
-     * @return `true` if buffer can be passed to [.writeToBuffer], otherwise `false`.
+     * @return `true` if buffer can be passed to [writeToBuffer], otherwise `false`.
      */
     fun isCapableBuffer(buffer: ByteBuffer?): Boolean {
         return buffer != null && buffer.capacity() >= packetSize
     }
 
     /**
-     * Create buffer which can be passed to [.writeToBuffer].
+     * Create buffer which can be passed to [writeToBuffer].
      *
      * @return created buffer.
      */
@@ -233,7 +261,7 @@ class ReaStreamPacket {
     }
 
     /**
-     * [.audioData] is not interleaved.
+     * [audioData] is not interleaved.
      * This method puts interleaved audio data to `outInterleavedAudioData`.
      *
      * @param outInterleavedAudioData Output audio data.
