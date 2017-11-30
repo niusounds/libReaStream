@@ -36,7 +36,6 @@ public class MainActivity extends Activity {
         bindService(new Intent(this, ReaStreamReceiverService.class), conn, BIND_AUTO_CREATE);
 
         audioTrackSink = new AudioTrackSink(44100);
-        audioTrackSink.start();
     }
 
     @Override

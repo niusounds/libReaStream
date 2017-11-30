@@ -135,7 +135,6 @@ class ReaStream(val sampleRate: Int = 44100) : AutoCloseable {
             try {
                 ReaStreamReceiver().use { receiver ->
                     AudioTrackSink(sampleRate).use { audioTrackSink ->
-                        audioTrackSink.start()
                         this@ReaStream.receiver = receiver
 
                         while (isReceiving) {
@@ -148,9 +147,6 @@ class ReaStream(val sampleRate: Int = 44100) : AutoCloseable {
                                 }
                             }
                         }
-
-                        audioTrackSink.stop()
-
                     }
                 }
             } catch (e: IOException) {

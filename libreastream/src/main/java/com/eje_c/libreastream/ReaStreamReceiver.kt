@@ -1,21 +1,17 @@
 package com.eje_c.libreastream
 
 import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
+import java.net.InetSocketAddress
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.channels.DatagramChannel
 
-class ReaStreamReceiver
-/**
- * Create ReaStream receiver
- *
- * @param socket Pre-created socket
- */
-(private val socket: DatagramSocket) : AutoCloseable {
-    private val packet: DatagramPacket
-    private val audioPacket = ReaStreamPacket()
+class ReaStreamReceiver(
+        private val socket: DatagramChannel = DatagramChannel.open(),
+        port: Int = DEFAULT_PORT) : AutoCloseable {
+
+    private val reaStreamPacket = ReaStreamPacket()
     private val buffer: ByteBuffer = ByteBuffer.allocate(ReaStreamPacket.MAX_BLOCK_LENGTH + ReaStreamPacket.AUDIO_PACKET_HEADER_BYTE_SIZE)
             .apply {
                 order(ByteOrder.LITTLE_ENDIAN)
@@ -23,17 +19,8 @@ class ReaStreamReceiver
 
     var identifier = DEFAULT_IDENTIFIER
 
-    /**
-     * Create ReaStream receiver with UDP socket specific port.
-     *
-     * @param port UDP port
-     * @throws SocketException
-     */
-    @Throws(SocketException::class)
-    @JvmOverloads constructor(port: Int = DEFAULT_PORT) : this(DatagramSocket(port))
-
     init {
-        packet = DatagramPacket(buffer.array(), buffer.capacity())
+        socket.socket().bind(InetSocketAddress(port))
     }
 
     /**
@@ -47,11 +34,12 @@ class ReaStreamReceiver
     fun receive(): ReaStreamPacket {
 
         do {
-            socket.receive(packet)
-            audioPacket.readFromBuffer(buffer)
-        } while (identifier != audioPacket.getIdentifier())
+            buffer.clear()
+            socket.receive(buffer)
+            reaStreamPacket.readFromBuffer(buffer)
+        } while (identifier != reaStreamPacket.getIdentifier())
 
-        return audioPacket
+        return reaStreamPacket
     }
 
     /**
@@ -66,7 +54,7 @@ class ReaStreamReceiver
      */
     @Throws(SocketException::class)
     fun setTimeout(timeout: Int) {
-        socket.soTimeout = timeout
+        socket.socket().soTimeout = timeout
     }
 
     /**

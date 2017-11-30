@@ -1,40 +1,12 @@
 package com.eje_c.libreastream
 
-import android.media.AudioFormat
-import android.media.AudioManager
-import android.media.AudioTrack
-
 class AudioTrackSink(sampleRate: Int) : AutoCloseable, ReaStreamReceiverService.OnReaStreamPacketListener {
-    private val track: AudioTrack
+
+    private val track = AudioTrack(sampleRate)
     private var convertedSamples: FloatArray? = null
 
-    init {
-        val bufferSize = Math.max(
-                AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT),
-                ReaStreamPacket.MAX_BLOCK_LENGTH * FLOAT_BYTE_SIZE
-        )
-        track = AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT, bufferSize, AudioTrack.MODE_STREAM)
-    }
-
-    /**
-     * Must call this before first [.onReceive].
-     */
-    fun start() {
-
-        if (track.playState != AudioTrack.PLAYSTATE_PLAYING) {
-            track.play()
-        }
-    }
-
-    fun stop() {
-
-        if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
-            track.stop()
-        }
-    }
-
     override fun close() {
-        track.release()
+        track.close()
     }
 
     override fun onReceive(packet: ReaStreamPacket) {
@@ -53,7 +25,7 @@ class AudioTrackSink(sampleRate: Int) : AutoCloseable, ReaStreamReceiverService.
                 }
 
                 packet.getInterleavedAudioData(convertedSamples!!)
-                track.write(convertedSamples!!, 0, sizeInFloats, AudioTrack.WRITE_NON_BLOCKING)
+                track.write(convertedSamples!!, sizeInFloats = sizeInFloats)
 
             } else if (packet.channels.toInt() == 1) {
 
@@ -72,12 +44,8 @@ class AudioTrackSink(sampleRate: Int) : AutoCloseable, ReaStreamReceiverService.
                     convertedSamples!![baseIndex] = convertedSamples!![baseIndex + 1]
                 }
 
-                track.write(convertedSamples!!, 0, sizeInFloats * 2, AudioTrack.WRITE_NON_BLOCKING)
+                track.write(convertedSamples!!, sizeInFloats = sizeInFloats * 2)
             }
         }
-    }
-
-    companion object {
-        private const val FLOAT_BYTE_SIZE = java.lang.Float.SIZE / java.lang.Byte.SIZE
     }
 }
