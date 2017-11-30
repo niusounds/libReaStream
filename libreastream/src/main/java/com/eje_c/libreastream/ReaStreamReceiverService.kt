@@ -27,7 +27,7 @@ class ReaStreamReceiverService : Service() {
         return localBinder
     }
 
-    fun startReveiving() {
+    fun startReceiving() {
 
         if (!isReceiving) {
 

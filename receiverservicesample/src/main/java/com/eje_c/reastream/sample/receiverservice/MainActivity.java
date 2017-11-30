@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     public void startReceiving(View view) {
 
         if (service != null) {
-            service.startReveiving();
+            service.startReceiving();
         }
     }
 
