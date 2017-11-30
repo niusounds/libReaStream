@@ -1,11 +1,13 @@
 package com.eje_c.libreastream
 
-import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.DatagramChannel
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
+import kotlin.concurrent.thread
 
 /**
  * Low-level [ReaStreamPacket] receiver.
@@ -24,28 +26,45 @@ class ReaStreamReceiver(
             .apply {
                 order(ByteOrder.LITTLE_ENDIAN)
             }
+    private var closed: Boolean = false
+
+    var onReaStreamPacketListener: OnReaStreamPacketListener? = null
 
     init {
         channel.socket().bind(InetSocketAddress(port))
-    }
+        channel.configureBlocking(false)
 
-    /**
-     * Wait for receiving [ReaStreamPacket].
-     * This method blocks until receiving ReaStream packet with same identifier.
-     *
-     * @return Received ReaStream packet.
-     * @throws IOException
-     */
-    @Throws(IOException::class)
-    fun receive(): ReaStreamPacket {
+        // Start async receiving thread
+        thread {
+            val selector = Selector.open()
+            channel.register(selector, SelectionKey.OP_READ)
 
-        do {
-            buffer.clear()
-            channel.receive(buffer)
-            reaStreamPacket.readFromBuffer(buffer)
-        } while (identifier != reaStreamPacket.getIdentifier())
+            // Stop when close() is called
+            while (!closed) {
 
-        return reaStreamPacket
+                selector.select()
+                val iterator = selector.selectedKeys().iterator()
+
+                while (iterator.hasNext()) {
+                    val key = iterator.next()
+                    iterator.remove()
+
+                    if (!key.isValid) {
+                        continue
+                    }
+
+                    if (key.isReadable) {
+                        buffer.clear()
+                        channel.receive(buffer)
+                        reaStreamPacket.readFromBuffer(buffer)
+                        if (identifier == reaStreamPacket.getIdentifier()) {
+                            onReaStreamPacketListener?.onReceive(reaStreamPacket)
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     /**
@@ -67,6 +86,7 @@ class ReaStreamReceiver(
      * Close UDP channel.
      */
     override fun close() {
+        closed = true
         channel.close()
     }
 }

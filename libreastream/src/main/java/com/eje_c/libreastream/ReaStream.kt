@@ -29,6 +29,7 @@ class ReaStream(
 
     private var sender: ReaStreamSender? = null     // Non null while sending
     private var receiver: ReaStreamReceiver? = null // Non null while receiving
+    private var audioTrackSink: AudioTrackSink? = null // Non null while receiving
 
     var remoteAddress: InetAddress? = null
         set(value) {
@@ -107,37 +108,23 @@ class ReaStream(
         if (!isReceiving) {
             isReceiving = true
 
-            // Start new thread to receive audio or MIDI data
-            thread {
+            receiver = ReaStreamReceiver(
+                    identifier = identifier,
+                    port = port
+            )
 
-                try {
-                    ReaStreamReceiver(
-                            identifier = identifier,
-                            port = port
-                    ).use { receiver ->
-                        AudioTrackSink(sampleRate).use { audioTrackSink ->
-                            this@ReaStream.receiver = receiver
+            audioTrackSink = AudioTrackSink(sampleRate)
 
-                            while (isReceiving) {
-                                if (isEnabled) {
-                                    val packet = receiver.receive()
-                                    if (packet.isAudioData) {
-                                        audioTrackSink.onReceive(packet)
-                                    } else if (packet.isMidiData) {
-                                        onMidiEvents?.invoke(packet.midiEvents!!)
-                                    }
-                                }
-                            }
-                        }
+            receiver?.onReaStreamPacketListener = object : OnReaStreamPacketListener {
+                override fun onReceive(packet: ReaStreamPacket) {
+                    if (packet.isAudioData) {
+                        audioTrackSink?.onReceive(packet)
+                    } else if (packet.isMidiData) {
+                        onMidiEvents?.invoke(packet.midiEvents!!)
                     }
-
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } finally {
-                    this@ReaStream.receiver = null
                 }
-
             }
+
         }
     }
 
@@ -156,6 +143,7 @@ class ReaStream(
     override fun close() {
         sender?.close()
         receiver?.close()
+        audioTrackSink?.close()
     }
 
     companion object {
