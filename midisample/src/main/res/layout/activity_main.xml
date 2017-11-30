@@ -1,16 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     tools:context="com.eje_c.midisample.MainActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="send"
-        android:text="Send"/>
+    <View
+        android:id="@+id/keyC"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+    <View
+        android:id="@+id/keyD"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyC"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyE"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyD"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyF"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyE"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyG"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyF"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyA"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyG"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyB"
+        android:layout_width="@dimen/whitekey_width"
+        android:layout_height="0dp"
+        android:background="@drawable/white_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/keyA"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyCis"
+        android:layout_width="@dimen/blackkey_width"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/blackkey_marginBottom"
+        android:layout_marginLeft="@dimen/blackkey_marginLeft"
+        android:background="@drawable/black_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/keyC"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyDis"
+        android:layout_width="@dimen/blackkey_width"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/blackkey_marginBottom"
+        android:layout_marginRight="@dimen/blackkey_marginLeft"
+        android:background="@drawable/black_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="@+id/keyE"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyFis"
+        android:layout_width="@dimen/blackkey_width"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/blackkey_marginBottom"
+        android:layout_marginLeft="@dimen/blackkey_marginLeft"
+        android:background="@drawable/black_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/keyF"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyGis"
+        android:layout_width="@dimen/blackkey_width"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/blackkey_marginBottom"
+        android:layout_marginLeft="44dp"
+        android:background="@drawable/black_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/keyG"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/keyAis"
+        android:layout_width="@dimen/blackkey_width"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/blackkey_marginBottom"
+        android:layout_marginRight="@dimen/blackkey_marginLeft"
+        android:background="@drawable/black_key"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="@+id/keyB"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

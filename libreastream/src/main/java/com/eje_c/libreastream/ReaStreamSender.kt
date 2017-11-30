@@ -1,6 +1,7 @@
 package com.eje_c.libreastream
 
 import java.io.IOException
+import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
@@ -9,7 +10,7 @@ import java.nio.channels.DatagramChannel
  * Low-level [ReaStreamPacket] sender.
  */
 class ReaStreamSender(
-        val remote: SocketAddress,
+        val remote: SocketAddress = InetSocketAddress(getBroadcastAddress().firstOrNull(), ReaStream.DEFAULT_PORT),
         private val channel: DatagramChannel = DatagramChannel.open(),
         val identifier: String = ReaStream.DEFAULT_IDENTIFIER) : AutoCloseable {
 
@@ -39,6 +40,9 @@ class ReaStreamSender(
 
         // Use async mode
         channel.configureBlocking(false)
+
+        // Enable broadcast packet
+        channel.socket().broadcast = true
     }
 
     /**
