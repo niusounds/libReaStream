@@ -53,10 +53,6 @@ class ReaStreamReceiverService : Service() {
             get() = this@ReaStreamReceiverService
     }
 
-    interface OnReaStreamPacketListener {
-        fun onReceive(packet: ReaStreamPacket)
-    }
-
     override fun onBind(intent: Intent): IBinder? {
         return localBinder
     }
