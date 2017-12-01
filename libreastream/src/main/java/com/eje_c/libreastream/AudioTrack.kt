@@ -7,7 +7,7 @@ import android.media.AudioTrack
 /**
  * Simple wrapper for [AudioTrack].
  */
-class AudioTrack(sampleRate: Int) : AutoCloseable {
+class AudioTrack(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable {
     private val track: AudioTrack
 
     init {
