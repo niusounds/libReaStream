@@ -8,7 +8,10 @@ import android.os.Build
 
 import java.nio.FloatBuffer
 
-class AudioRecordSrc(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable {
+/**
+ * Simple wrapper for [AudioRecord].
+ */
+class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable {
     private val record: AudioRecord
     private val recordBuffer: FloatArray
     private val floatBuffer: FloatBuffer

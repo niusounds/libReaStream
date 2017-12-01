@@ -61,7 +61,7 @@ class ReaStream(
                             remote = InetSocketAddress(remoteAddress, port),
                             identifier = identifier
                     ).use { sender ->
-                        AudioRecordSrc(sampleRate).use { audioRecordSrc ->
+                        AudioRecord(sampleRate).use { audioRecordSrc ->
 
                             audioRecordSrc.start()
                             this@ReaStream.sender = sender
