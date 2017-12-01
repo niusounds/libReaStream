@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Switch ReaStream mode
-        radioGroup.setOnCheckedChangeListener { group, checkedId ->
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_mode_receive -> {
                     if (reaStream.isSending) {

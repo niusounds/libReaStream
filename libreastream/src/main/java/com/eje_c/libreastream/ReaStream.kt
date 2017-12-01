@@ -62,8 +62,6 @@ class ReaStream(
                             identifier = identifier
                     ).use { sender ->
                         AudioRecord(sampleRate).use { audioRecordSrc ->
-
-                            audioRecordSrc.start()
                             this@ReaStream.sender = sender
 
                             sender.sampleRate = sampleRate
@@ -78,8 +76,6 @@ class ReaStream(
                                     sender.send(buffer.array(), readCount)
                                 }
                             }
-
-                            audioRecordSrc.stop()
 
                         }
                     }

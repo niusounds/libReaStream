@@ -22,35 +22,22 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
         val audioFormat = if (isAndroidM) AudioFormat.ENCODING_PCM_FLOAT else AudioFormat.ENCODING_PCM_16BIT
         val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, audioFormat)
         record = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channel, audioFormat, bufferSize)
+        record.startRecording()
+
+        // Prepare float buffer
         floatBuffer = FloatBuffer.allocate(bufferSize / 4)
         recordBuffer = floatBuffer.array()
 
-        if (!isAndroidM) {
-            shortBuffer = ShortArray(bufferSize / 4)
+        // Use short buffer if running on prior to M
+        shortBuffer = if (!isAndroidM) {
+            ShortArray(bufferSize / 4)
         } else {
-            shortBuffer = null
-        }
-    }
-
-
-    /**
-     * Must call this before first [.read].
-     */
-    fun start() {
-
-        if (record.recordingState == AudioRecord.RECORDSTATE_STOPPED) {
-            record.startRecording()
-        }
-    }
-
-    fun stop() {
-
-        if (record.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
-            record.stop()
+            null
         }
     }
 
     override fun close() {
+        record.stop()
         record.release()
     }
 
@@ -83,7 +70,7 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
     }
 
     companion object {
-        private val SHORT_TO_FLOAT = 1.0f / java.lang.Short.MAX_VALUE
+        private val SHORT_TO_FLOAT = 1.0f / Short.MAX_VALUE
 
         private val isAndroidM: Boolean
             get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
