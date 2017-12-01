@@ -50,20 +50,12 @@ class MainActivity : AppCompatActivity() {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_mode_receive -> {
-                    if (reaStream.isSending) {
-                        reaStream.stopSending()
-                    }
-                    if (!reaStream.isReceiving) {
-                        reaStream.startReceiving()
-                    }
+                    reaStream.stopSending()
+                    reaStream.startReceiving()
                 }
                 R.id.radio_mode_send -> {
-                    if (reaStream.isReceiving) {
-                        reaStream.stopReceiving()
-                    }
-                    if (!reaStream.isSending) {
-                        reaStream.startSending()
-                    }
+                    reaStream.stopReceiving()
+                    reaStream.startSending()
                 }
             }
         }

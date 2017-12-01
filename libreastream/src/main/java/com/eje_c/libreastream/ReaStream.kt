@@ -129,6 +129,8 @@ class ReaStream(
      */
     fun stopReceiving() {
         isReceiving = false
+        receiver?.close()
+        receiver = null
     }
 
     @Throws(UnknownHostException::class)
