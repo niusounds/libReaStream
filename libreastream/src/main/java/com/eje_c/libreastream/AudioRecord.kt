@@ -13,27 +13,21 @@ import java.nio.FloatBuffer
  */
 class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable {
     private val record: AudioRecord
-    private val recordBuffer: FloatArray
     private val floatBuffer: FloatBuffer
-    private val shortBuffer: ShortArray?
+    private val audioReader: AudioReader
+    private val bufferSize: Int
 
     init {
         val channel = AudioFormat.CHANNEL_IN_MONO
         val audioFormat = if (isAndroidM) AudioFormat.ENCODING_PCM_FLOAT else AudioFormat.ENCODING_PCM_16BIT
-        val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, audioFormat)
+        bufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, audioFormat)
         record = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channel, audioFormat, bufferSize)
         record.startRecording()
 
         // Prepare float buffer
         floatBuffer = FloatBuffer.allocate(bufferSize / 4)
-        recordBuffer = floatBuffer.array()
 
-        // Use short buffer if running on prior to M
-        shortBuffer = if (!isAndroidM) {
-            ShortArray(bufferSize / 4)
-        } else {
-            null
-        }
+        audioReader = if (isAndroidM) AudioReaderM() else AudioReaderPriorM()
     }
 
     override fun close() {
@@ -49,11 +43,32 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
     @SuppressLint("NewApi")
     fun read(): FloatBuffer {
 
-        if (isAndroidM) {
-            val readCount = record.read(recordBuffer, 0, recordBuffer.size, AudioRecord.READ_NON_BLOCKING)
-            floatBuffer.limit(readCount)
-        } else {
-            val readCount = record.read(shortBuffer!!, 0, shortBuffer.size)
+        val readCount = audioReader.read()
+
+        floatBuffer.limit(readCount)
+
+        return floatBuffer
+    }
+
+    interface AudioReader {
+        fun read(): Int
+    }
+
+    private inner class AudioReaderM : AudioReader {
+
+        val recordBuffer: FloatArray = floatBuffer.array()
+
+        @SuppressLint("NewApi")
+        override fun read(): Int {
+            return record.read(recordBuffer, 0, recordBuffer.size, AudioRecord.READ_NON_BLOCKING)
+        }
+    }
+
+    private inner class AudioReaderPriorM : AudioReader {
+        val shortBuffer = ShortArray(bufferSize / 4)
+
+        override fun read(): Int {
+            val readCount = record.read(shortBuffer, 0, shortBuffer.size)
 
             // Convert short[] to float[]
             floatBuffer.position(0)
@@ -63,10 +78,8 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
                 floatBuffer.put(f)
             }
 
-            floatBuffer.limit(readCount)
+            return readCount
         }
-
-        return floatBuffer
     }
 
     companion object {
