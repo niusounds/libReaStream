@@ -260,24 +260,6 @@ class ReaStreamPacket {
         return buffer
     }
 
-    /**
-     * [audioData] is not interleaved.
-     * This method puts interleaved audio data to `outInterleavedAudioData`.
-     *
-     * @param outInterleavedAudioData Output audio data.
-     */
-    fun getInterleavedAudioData(outInterleavedAudioData: FloatArray) {
-
-        val samples = blockLength / ReaStreamPacket.PER_SAMPLE_BYTES
-        val samplesPerChannel = samples / channels
-
-        for (i in 0 until samplesPerChannel) {
-            for (ch in 0 until channels) {
-                outInterleavedAudioData[i * channels + ch] = audioData!![samplesPerChannel * ch + i]
-            }
-        }
-    }
-
     companion object {
         const val MAX_BLOCK_LENGTH: Short = 1200
         const val PER_SAMPLE_BYTES = java.lang.Float.SIZE / java.lang.Byte.SIZE

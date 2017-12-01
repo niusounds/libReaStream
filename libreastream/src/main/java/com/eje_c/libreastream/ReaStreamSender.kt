@@ -14,9 +14,9 @@ import java.nio.channels.DatagramChannel
  */
 class ReaStreamSender(
         val remote: SocketAddress = InetSocketAddress(getBroadcastAddress().firstOrNull(), ReaStream.DEFAULT_PORT),
-        private val channel: DatagramChannel = DatagramChannel.open(),
         val identifier: String = ReaStream.DEFAULT_IDENTIFIER) : AutoCloseable {
 
+    private val channel: DatagramChannel = DatagramChannel.open()
     private var buffer: ByteBuffer? = null
     private val reaStreamPacket = ReaStreamPacket()
 

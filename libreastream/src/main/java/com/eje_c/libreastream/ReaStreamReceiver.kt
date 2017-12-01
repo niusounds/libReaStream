@@ -1,7 +1,6 @@
 package com.eje_c.libreastream
 
 import java.net.InetSocketAddress
-import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.DatagramChannel
@@ -17,10 +16,12 @@ import kotlin.concurrent.thread
  * @param port Waiting port number. Default value is [ReaStream.DEFAULT_PORT] which is used by original ReaStream plugin.
  */
 class ReaStreamReceiver(
-        private val channel: DatagramChannel = DatagramChannel.open(),
         val identifier: String = ReaStream.DEFAULT_IDENTIFIER,
-        port: Int = ReaStream.DEFAULT_PORT) : AutoCloseable {
+        val port: Int = ReaStream.DEFAULT_PORT,
+        var audioPacketHandler: AudioPacketHandler? = null,
+        val midiPacketHandler: MidiPacketHandler? = null) : AutoCloseable {
 
+    private val channel: DatagramChannel = DatagramChannel.open()
     private val reaStreamPacket = ReaStreamPacket()
     private val buffer: ByteBuffer = ByteBuffer.allocate(ReaStreamPacket.MAX_BLOCK_LENGTH + ReaStreamPacket.AUDIO_PACKET_HEADER_BYTE_SIZE)
             .apply {
@@ -28,7 +29,6 @@ class ReaStreamReceiver(
             }
     private var closed: Boolean = false
 
-    var onReaStreamPacketListener: OnReaStreamPacketListener? = null
 
     init {
         channel.socket().bind(InetSocketAddress(port))
@@ -58,7 +58,28 @@ class ReaStreamReceiver(
                         channel.receive(buffer)
                         reaStreamPacket.readFromBuffer(buffer)
                         if (identifier == reaStreamPacket.getIdentifier()) {
-                            onReaStreamPacketListener?.onReceive(reaStreamPacket)
+
+                            if (reaStreamPacket.isAudioData) {
+
+                                audioPacketHandler?.let { audioPacketHandler ->
+
+                                    val channels = reaStreamPacket.channels.toInt()
+                                    val sampleRate = reaStreamPacket.sampleRate
+                                    val audioData = reaStreamPacket.audioData!!
+                                    val audioDataLength = reaStreamPacket.blockLength / ReaStreamPacket.PER_SAMPLE_BYTES
+
+                                    audioPacketHandler.process(channels, sampleRate, audioData, audioDataLength)
+                                }
+
+                            } else if (reaStreamPacket.isMidiData) {
+
+                                midiPacketHandler?.let { midiPacketHandler ->
+                                    reaStreamPacket.midiEvents!!.forEach { midiEvent ->
+                                        midiPacketHandler.process(midiEvent)
+                                    }
+                                }
+
+                            }
                         }
                     }
                 }
@@ -68,25 +89,13 @@ class ReaStreamReceiver(
     }
 
     /**
-     * Sets the read timeout in milliseconds for this channel.
-     * This receive timeout defines the period the channel will block waiting to
-     * receive data before throwing an `InterruptedIOException`. The value
-     * `0` (default) is used to set an infinite timeout. To have effect
-     * this option must be set before the blocking method was called.
-     *
-     * @param timeout the timeout in milliseconds or 0 for no timeout.
-     * @throws SocketException if an error occurs while setting the option.
-     */
-    @Throws(SocketException::class)
-    fun setTimeout(timeout: Int) {
-        channel.socket().soTimeout = timeout
-    }
-
-    /**
      * Close UDP channel.
      */
     override fun close() {
         closed = true
         channel.close()
+
+        audioPacketHandler?.release()
+        midiPacketHandler?.release()
     }
 }

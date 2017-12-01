@@ -11,7 +11,8 @@ import java.nio.FloatBuffer
 /**
  * Simple wrapper for [AudioRecord].
  */
-class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseable {
+class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AudioStreamSource {
+
     private val record: AudioRecord
     private val floatBuffer: FloatBuffer
     private val audioReader: AudioReader
@@ -30,18 +31,17 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
         audioReader = if (isAndroidM) AudioReaderM() else AudioReaderPriorM()
     }
 
-    override fun close() {
+    override fun release() {
         record.stop()
         record.release()
     }
 
     /**
-     * Read audio data from [android.media.AudioTrack] and return it.
+     * Read audio data from [AudioRecord] in float format and return it.
      *
      * @return Audio data FloatBuffer.
      */
-    @SuppressLint("NewApi")
-    fun read(): FloatBuffer {
+    override fun read(): FloatBuffer {
 
         val readCount = audioReader.read()
 
@@ -87,5 +87,11 @@ class AudioRecord(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AutoCloseab
 
         private val isAndroidM: Boolean
             get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    }
+
+    class Factory(val sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AudioStreamSource.Factory {
+        override fun create(): AudioStreamSource {
+            return AudioRecord(sampleRate = sampleRate)
+        }
     }
 }

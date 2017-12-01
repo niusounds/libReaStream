@@ -14,8 +14,11 @@ import kotlin.concurrent.thread
  */
 class ReaStream(
         val sampleRate: Int = DEFAULT_SAMPLE_RATE,
-        val identifier: String = DEFAULT_IDENTIFIER,
-        val port: Int = DEFAULT_PORT) : AutoCloseable {
+        var identifier: String = DEFAULT_IDENTIFIER,
+        val port: Int = DEFAULT_PORT,
+        val audioStreamSourceFactory: AudioStreamSource.Factory = AudioRecord.Factory(sampleRate),
+        val audioPacketHandlerFactory: AudioPacketHandler.Factory = AudioTrackSink.Factory(sampleRate),
+        val midiPacketHandlerFactory: MidiPacketHandler.Factory? = null) : AutoCloseable {
 
     var isSending: Boolean = false
         private set
@@ -25,11 +28,8 @@ class ReaStream(
 
     var isEnabled = true
 
-    var onMidiEvents: ((Array<MidiEvent>) -> Unit)? = null
-
     private var sender: ReaStreamSender? = null     // Non null while sending
     private var receiver: ReaStreamReceiver? = null // Non null while receiving
-    private var audioTrackSink: AudioTrackSink? = null // Non null while receiving
 
     var remoteAddress: InetAddress? = null
         set(value) {
@@ -56,32 +56,32 @@ class ReaStream(
             // Start new thread to send audio
             thread {
 
+                val streamSource = audioStreamSourceFactory.create()
+
                 try {
                     ReaStreamSender(
                             remote = InetSocketAddress(remoteAddress, port),
                             identifier = identifier
                     ).use { sender ->
-                        AudioRecord(sampleRate).use { audioRecordSrc ->
-                            this@ReaStream.sender = sender
+                        this@ReaStream.sender = sender
 
-                            sender.sampleRate = sampleRate
-                            sender.channels = 1.toByte()
+                        sender.sampleRate = sampleRate
+                        sender.channels = 1.toByte()
 
-                            while (isSending) {
+                        while (isSending) {
 
-                                // Read from mic and send it
-                                val buffer = audioRecordSrc.read()
-                                val readCount = buffer.limit()
-                                if (isEnabled && readCount > 0) {
-                                    sender.send(buffer.array(), readCount)
-                                }
+                            // Read from mic and send it
+                            val buffer = streamSource.read()
+                            val readCount = buffer.limit()
+                            if (isEnabled && readCount > 0) {
+                                sender.send(buffer.array(), readCount)
                             }
-
                         }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
                 } finally {
+                    streamSource.release()
                     this@ReaStream.sender = null
                 }
 
@@ -106,20 +106,10 @@ class ReaStream(
 
             receiver = ReaStreamReceiver(
                     identifier = identifier,
-                    port = port
+                    port = port,
+                    audioPacketHandler = audioPacketHandlerFactory.create(),
+                    midiPacketHandler = midiPacketHandlerFactory?.create()
             )
-
-            audioTrackSink = AudioTrackSink(sampleRate)
-
-            receiver?.onReaStreamPacketListener = object : OnReaStreamPacketListener {
-                override fun onReceive(packet: ReaStreamPacket) {
-                    if (packet.isAudioData) {
-                        audioTrackSink?.onReceive(packet)
-                    } else if (packet.isMidiData) {
-                        onMidiEvents?.invoke(packet.midiEvents!!)
-                    }
-                }
-            }
 
         }
     }
@@ -129,6 +119,7 @@ class ReaStream(
      */
     fun stopReceiving() {
         isReceiving = false
+
         receiver?.close()
         receiver = null
     }
@@ -141,7 +132,6 @@ class ReaStream(
     override fun close() {
         sender?.close()
         receiver?.close()
-        audioTrackSink?.close()
     }
 
     companion object {

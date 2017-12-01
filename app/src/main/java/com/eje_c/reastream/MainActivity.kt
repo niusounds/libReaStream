@@ -6,20 +6,25 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import com.eje_c.libreastream.MidiEvent
+import com.eje_c.libreastream.MidiPacketHandler
 import com.eje_c.libreastream.ReaStream
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.UnknownHostException
 
 class MainActivity : AppCompatActivity() {
 
-    private var reaStream: ReaStream = ReaStream()
+    private lateinit var reaStream: ReaStream
     private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Init lateinit fields
+        // Create ReaStream instance
+        reaStream = ReaStream(
+                midiPacketHandlerFactory = MidiHandlerFactory()
+        )
         prefs = getSharedPreferences("app_status", Context.MODE_PRIVATE)
 
         // Watch identifier text field
@@ -35,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString("identifier", newVal).apply()
 
                 // Set identifier
-                updateReaStream(identifier = newVal)
+                reaStream.identifier = newVal
             }
         })
 
@@ -43,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         val defaultIdentifier = prefs.getString("identifier", null)
         if (defaultIdentifier != null) {
             identifier.setText(defaultIdentifier)
-            updateReaStream(identifier = defaultIdentifier)
+            reaStream.identifier = defaultIdentifier
         }
 
         // Switch ReaStream mode
@@ -102,46 +107,30 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-
-        // Show MIDI events
-        reaStream.onMidiEvents = { midiEvents ->
-
-            // This callback is called in background thread.
-            // UI update must be in main thread.
-
-            runOnUiThread {
-                this.midiEvents.text = midiEvents.map { ev -> ev.toString() }.joinToString()
-            }
-        }
-    }
-
-    private fun updateReaStream(identifier: String = reaStream.identifier) {
-
-        // Original state
-        val receiving = reaStream.isReceiving
-        val sending = reaStream.isSending
-        val remoteAddress = reaStream.remoteAddress
-
-        // Close current session
-        reaStream.close()
-
-        // Create new instance
-        reaStream = ReaStream(identifier = identifier)
-
-        // Restore previous state
-        reaStream.remoteAddress = remoteAddress
-
-        if (receiving) {
-            reaStream.startReceiving()
-        }
-
-        if (sending) {
-            reaStream.startSending()
-        }
     }
 
     override fun onDestroy() {
+        // Release ReaStream when Activity is destroyed
         reaStream.close()
         super.onDestroy()
+    }
+
+    /**
+     * Show MIDI event in text field.
+     */
+    inner class MidiHandler : MidiPacketHandler {
+        override fun process(midiEvent: MidiEvent) {
+            runOnUiThread {
+                this@MainActivity.midiEvents.text = midiEvent.toString()
+            }
+        }
+
+        override fun release() {
+            // Do nothing
+        }
+    }
+
+    inner class MidiHandlerFactory : MidiPacketHandler.Factory {
+        override fun create(): MidiPacketHandler = MidiHandler()
     }
 }
