@@ -1,8 +1,12 @@
 package com.eje_c.reastream
 
+import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,18 +18,45 @@ import java.net.UnknownHostException
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var reaStream: ReaStream
+    companion object {
+        const val REQUEST_CODE = 111
+    }
+
+    private var reaStream: ReaStream? = null
     private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        prefs = getSharedPreferences("app_status", Context.MODE_PRIVATE)
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            initReaStream()
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            REQUEST_CODE -> {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initReaStream()
+                } else {
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun initReaStream() {
         // Create ReaStream instance
         reaStream = ReaStream(
                 midiPacketHandlerFactory = MidiHandlerFactory()
         )
-        prefs = getSharedPreferences("app_status", Context.MODE_PRIVATE)
 
         // Watch identifier text field
         identifier.addTextChangedListener(object : TextWatcher {
@@ -40,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString("identifier", newVal).apply()
 
                 // Set identifier
-                reaStream.identifier = newVal
+                reaStream!!.identifier = newVal
             }
         })
 
@@ -48,29 +79,29 @@ class MainActivity : AppCompatActivity() {
         val defaultIdentifier = prefs.getString("identifier", null)
         if (defaultIdentifier != null) {
             identifier.setText(defaultIdentifier)
-            reaStream.identifier = defaultIdentifier
+            reaStream!!.identifier = defaultIdentifier
         }
 
         // Switch ReaStream mode
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_mode_receive -> {
-                    reaStream.stopSending()
-                    reaStream.startReceiving()
+                    reaStream!!.stopSending()
+                    reaStream!!.startReceiving()
                 }
                 R.id.radio_mode_send -> {
-                    reaStream.stopReceiving()
-                    reaStream.startSending()
+                    reaStream!!.stopReceiving()
+                    reaStream!!.startSending()
                 }
             }
         }
 
         // Bind "enabled" checkbox to ReaStream.isEnabled
-        enabled.isChecked = reaStream.isEnabled
-        enabled.setOnCheckedChangeListener { _, isChecked -> reaStream.isEnabled = isChecked }
+        enabled.isChecked = reaStream!!.isEnabled
+        enabled.setOnCheckedChangeListener { _, isChecked -> reaStream!!.isEnabled = isChecked }
 
         // Default is receiving mode
-        reaStream.startReceiving()
+        reaStream!!.startReceiving()
 
         // Watch remote address text field
         remoteAddress.addTextChangedListener(object : TextWatcher {
@@ -85,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 if (newVal.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}".toRegex())) {
 
                     try {
-                        reaStream.setRemoteAddress(newVal)
+                        reaStream!!.setRemoteAddress(newVal)
 
                         // Save
                         prefs.edit().putString("remoteAddress", newVal).apply()
@@ -102,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             remoteAddress.setText(defaultRemoteAddress)
 
             try {
-                reaStream.setRemoteAddress(defaultRemoteAddress)
+                reaStream!!.setRemoteAddress(defaultRemoteAddress)
             } catch (e: UnknownHostException) {
                 e.printStackTrace()
             }
@@ -111,7 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         // Release ReaStream when Activity is destroyed
-        reaStream.close()
+        reaStream?.close()
         super.onDestroy()
     }
 
