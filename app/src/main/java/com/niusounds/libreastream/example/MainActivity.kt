@@ -1,4 +1,4 @@
-package com.eje_c.reastream
+package com.niusounds.libreastream.example
 
 import android.Manifest
 import android.content.Context
@@ -10,9 +10,9 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import com.eje_c.libreastream.MidiEvent
-import com.eje_c.libreastream.MidiPacketHandler
-import com.eje_c.libreastream.ReaStream
+import com.niusounds.libreastream.MidiEvent
+import com.niusounds.libreastream.MidiPacketHandler
+import com.niusounds.libreastream.ReaStream
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.UnknownHostException
 

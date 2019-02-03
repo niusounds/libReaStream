@@ -1,4 +1,4 @@
-package com.eje_c.libreastream
+package com.niusounds.libreastream
 
 import android.annotation.SuppressLint
 import android.media.AudioFormat

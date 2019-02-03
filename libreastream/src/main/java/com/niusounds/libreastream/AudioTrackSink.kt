@@ -1,4 +1,4 @@
-package com.eje_c.libreastream
+package com.niusounds.libreastream
 
 class AudioTrackSink(sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE) : AudioPacketHandler {
 

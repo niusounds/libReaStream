@@ -1,10 +1,10 @@
-package com.eje_c.midisample
+package com.niusounds.libreastream.midisample
 
 import android.app.Activity
 import android.os.Bundle
 import android.view.MotionEvent
-import com.eje_c.libreastream.MidiEvent
-import com.eje_c.libreastream.ReaStreamSender
+import com.niusounds.libreastream.MidiEvent
+import com.niusounds.libreastream.ReaStreamSender
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
 
