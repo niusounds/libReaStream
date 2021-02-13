@@ -1,1 +1,1 @@
-include ':app', ':libreastream', ':midisample'
+include ':app', ':libreastream', ':midisample', ':flowsample'

@@ -19,7 +19,21 @@ and...
 
 ## How to use libreastream in your app
 
-Use `ReaStream` class.
+```gradle
+// app/build.gradle
+
+repositories {
+    google()
+    maven { url 'https://jitpack.io' }
+}
+
+
+dependencies {
+    implementation 'com.github.niusounds:libReaStream:master-SNAPSHOT' // Add this
+}
+```
+
+See sample app code for more information.
 
 ### Receive audio from remote
 
