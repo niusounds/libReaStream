@@ -29,7 +29,7 @@ repositories {
 
 
 dependencies {
-    implementation 'com.github.niusounds:libReaStream:master-SNAPSHOT' // Add this
+    implementation 'com.github.niusounds:libReaStream:0.0.2' // Add this
 }
 ```
 
