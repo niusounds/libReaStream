@@ -49,7 +49,7 @@ class DatagramChannelReceiver(
                             val buffer = buffers[i]
                             buffer.clear()
                             channel.receive(buffer)
-                            offer(buffer)
+                            trySend(buffer)
                             i++
                             if (i >= buffers.size) {
                                 i = 0
