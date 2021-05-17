@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import com.niusounds.libreastream.MidiEvent
 import com.niusounds.libreastream.ReaStreamSender
-import kotlinx.android.synthetic.main.activity_main.*
+import com.niusounds.libreastream.midisample.databinding.ActivityMainBinding
 import java.util.concurrent.Executors
 
 class MainActivity : Activity() {
@@ -15,20 +15,22 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        ActivityMainBinding.inflate(layoutInflater).apply {
+            setContentView(root)
 
-        keyC.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 60) }
-        keyCis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 61) }
-        keyD.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 62) }
-        keyDis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 63) }
-        keyE.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 64) }
-        keyF.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 65) }
-        keyFis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 66) }
-        keyG.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 67) }
-        keyGis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 68) }
-        keyA.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 69) }
-        keyAis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 70) }
-        keyB.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 71) }
+            keyC.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 60) }
+            keyCis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 61) }
+            keyD.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 62) }
+            keyDis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 63) }
+            keyE.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 64) }
+            keyF.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 65) }
+            keyFis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 66) }
+            keyG.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 67) }
+            keyGis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 68) }
+            keyA.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 69) }
+            keyAis.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 70) }
+            keyB.setOnTouchListener { _, motionEvent -> noteEvent(motionEvent, 71) }
+        }
     }
 
     override fun onDestroy() {
