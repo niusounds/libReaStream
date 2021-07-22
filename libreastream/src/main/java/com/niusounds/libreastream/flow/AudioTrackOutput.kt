@@ -15,10 +15,14 @@ import kotlinx.coroutines.flow.onEach
  * Output [ReaStreamPacket] audio data to device's speaker.
  * [sampleRate] must be the same with ReaStream sender. Re-sampling is not supported.
  * Recommend to use same [channels] with ReaStream sender.
+ *
+ * [bufferScaleFactor] is scale factor for AudioTrack.getMinBufferSize.
+ * Use large value for stable playing but requires more memory.
  */
 class AudioTrackOutput(
     private val sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE,
     private val channels: Int = 2,
+    private val bufferScaleFactor: Int = 4,
 ) {
     suspend fun play(flow: Flow<ReaStreamPacket>) {
         val channelMask = when (channels) {
@@ -26,7 +30,7 @@ class AudioTrackOutput(
             2 -> AudioFormat.CHANNEL_OUT_STEREO
             else -> throw IllegalStateException("unsupported channels")
         }
-        val bufferSize = AudioTrack.getMinBufferSize(
+        val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
             sampleRate,
             channelMask,
             AudioFormat.ENCODING_PCM_FLOAT
@@ -81,7 +85,7 @@ class AudioTrackOutput(
                                 convertedSamples,
                                 0,
                                 audioDataLength,
-                                AudioTrack.WRITE_NON_BLOCKING
+                                AudioTrack.WRITE_BLOCKING
                             )
                         } else {
                             // Down-mix stereo -> mono
@@ -97,7 +101,7 @@ class AudioTrackOutput(
                                 convertedSamples,
                                 0,
                                 audioDataLengthMono,
-                                AudioTrack.WRITE_NON_BLOCKING
+                                AudioTrack.WRITE_BLOCKING
                             )
                         }
                     }
@@ -107,7 +111,7 @@ class AudioTrackOutput(
                                 audioData,
                                 0,
                                 audioDataLength,
-                                AudioTrack.WRITE_NON_BLOCKING
+                                AudioTrack.WRITE_BLOCKING
                             )
                         } else {
                             // Convert mono -> stereo
@@ -121,7 +125,7 @@ class AudioTrackOutput(
                                 convertedSamples,
                                 0,
                                 audioDataLength * 2,
-                                AudioTrack.WRITE_NON_BLOCKING
+                                AudioTrack.WRITE_BLOCKING
                             )
                         }
                     }
