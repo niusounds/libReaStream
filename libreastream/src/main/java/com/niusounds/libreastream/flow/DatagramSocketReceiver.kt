@@ -41,7 +41,7 @@ class DatagramSocketReceiver(
                     val bufferBlock = bufferBlocks[i]
                     socket.receive(bufferBlock.packet)
                     bufferBlock.prepare()
-                    offer(bufferBlock.byteBuffer)
+                    trySend(bufferBlock.byteBuffer)
                     i++
                     if (i >= bufferBlocks.size) {
                         i = 0
