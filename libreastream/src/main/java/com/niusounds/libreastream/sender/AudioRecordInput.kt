@@ -55,3 +55,19 @@ class AudioRecordInput(
         }
     }
 }
+
+/**
+ * Interleaved audio data to Non-Interleaved audio data.
+ */
+fun FloatArray.deInterleave(channels: Int): FloatArray {
+    val result = FloatArray(size)
+    val perChannelSize = size / channels
+
+    forEachIndexed { index, sample ->
+        val ch = index % channels
+        val i = index / channels
+        result[perChannelSize * ch + i] = sample
+    }
+
+    return result
+}

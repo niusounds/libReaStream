@@ -24,10 +24,12 @@ import androidx.lifecycle.lifecycleScope
 import com.niusounds.libreastream.sender.AudioRecordInput
 import com.niusounds.libreastream.sender.KtorUdpSender
 import com.niusounds.libreastream.sender.ReaStreamSender
+import com.niusounds.libreastream.sender.deInterleave
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +37,10 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            startRecording()
+            startRecording(
+                sampleRate = 48000,
+                channels = 2,
+            )
         } else {
             Toast.makeText(
                 applicationContext,
@@ -66,28 +71,31 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startRecording() {
+    private fun startRecording(sampleRate: Int, channels: Int) {
         check(!recording.value) { "startRecording() is called twice" }
         recording.value = true
 
         recordingJob = lifecycleScope.launchWhenStarted {
             withContext(Dispatchers.IO) {
                 val input = AudioRecordInput(
-                    sampleRate = 48000,
-                    channels = 1,
+                    sampleRate = sampleRate,
+                    channels = channels,
                 )
                 val sender = ReaStreamSender(
                     identifier = "android",
-                    sampleRate = 48000,
-                    channels = 1,
+                    sampleRate = sampleRate,
+                    channels = channels,
                     sender = KtorUdpSender(
                         host = "192.168.86.79"
                     )
                 )
 
-                input.readAudio().collect { audioData ->
-                    sender.send(audioData)
-                }
+                input.readAudio()
+                    // ReaStream uses non-interleaved arrangement
+                    .map { it.deInterleave(channels = channels) }
+                    .collect { audioData ->
+                        sender.send(audioData)
+                    }
             }
         }
     }
