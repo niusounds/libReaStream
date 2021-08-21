@@ -31,9 +31,17 @@ class ReaStreamSender(
         sampleRate = sampleRate,
         channels = channels,
     )
+    private val midiSerializer = MidiDataSerializer(
+        identifier = identifier,
+    )
 
     suspend fun send(audioData: FloatArray) {
         val bytes = serializer.toByteBuffer(audioData)
+        sender.send(bytes)
+    }
+
+    suspend fun send(midiData: ByteArray) {
+        val bytes = midiSerializer.toByteBuffer(midiData = midiData)
         sender.send(bytes)
     }
 }
