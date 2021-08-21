@@ -1,14 +1,15 @@
 package com.niusounds.flowsample
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.niusounds.flowsample.databinding.ActivityMainBinding
 import com.niusounds.libreastream.flow.AudioTrackOutput
-import com.niusounds.libreastream.flow.ReaStreamReceiver
+import com.niusounds.libreastream.flow.receiveReaStream
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -17,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(root)
             lifecycleScope.launch {
-                val packets = ReaStreamReceiver().packets
+                val packets = receiveReaStream().shareIn(this, SharingStarted.WhileSubscribed())
                 launch {
                     AudioTrackOutput().play(packets)
                 }

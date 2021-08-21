@@ -1,11 +1,10 @@
 package com.niusounds.libreastream.flow
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
+@Deprecated("Use receiveReaStream.")
 class ReaStreamFlowConverter(
     private val identifier: String,
     private val receiver: PacketReceiver,
