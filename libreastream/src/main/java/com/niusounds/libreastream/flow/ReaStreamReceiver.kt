@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class ReaStreamReceiver(
     identifier: String = ReaStream.DEFAULT_IDENTIFIER,
-    receiver: PacketReceiver = DatagramChannelReceiver(ReaStream.DEFAULT_PORT, 65535),
+    receiver: PacketReceiver = KtorUdpReceiver(ReaStream.DEFAULT_PORT),
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = Dispatchers.IO,
 ) {
