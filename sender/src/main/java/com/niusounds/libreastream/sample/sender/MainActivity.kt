@@ -25,12 +25,10 @@ import androidx.lifecycle.lifecycleScope
 import com.niusounds.libreastream.sender.AudioRecordInput
 import com.niusounds.libreastream.sender.ReaStreamSender
 import com.niusounds.libreastream.sender.deInterleave
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val checkPermission = registerForActivityResult(
