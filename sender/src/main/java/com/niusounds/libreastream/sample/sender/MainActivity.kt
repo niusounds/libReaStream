@@ -2,6 +2,7 @@ package com.niusounds.libreastream.sample.sender
 
 import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -94,7 +95,12 @@ class MainActivity : ComponentActivity() {
                     // ReaStream uses non-interleaved arrangement
                     .map { it.deInterleave(channels = channels) }
                     .collect { audioData ->
-                        sender.send(audioData)
+                        try {
+                            sender.send(audioData)
+                        } catch (e: Exception) {
+                            Log.e("Sender", "Error: $e")
+                            stopRecording()
+                        }
                     }
             }
         }
