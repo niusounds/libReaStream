@@ -10,12 +10,11 @@ class ReaStreamFlowConverter(
     private val identifier: String,
     private val receiver: PacketReceiver,
 ) {
-    fun receive(): Flow<ReaStreamPacket> = flow {
-        emitAll(receiver.receive()
+    fun receive(): Flow<ReaStreamPacket> {
+        return receiver.receive()
             .map {
                 ByteBufferReaStreamPacket(it)
             }
             .filter { it.identifier == identifier }
-        )
     }
 }
