@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +31,11 @@ import com.niusounds.libreastream.sender.AudioRecordInput
 import com.niusounds.libreastream.sender.ReaStreamSender
 import com.niusounds.libreastream.sender.deInterleave
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val checkPermission = registerForActivityResult(
@@ -71,6 +74,9 @@ class MainActivity : ComponentActivity() {
                     },
                     onStop = {
                         stopRecording()
+                    },
+                    onSendMidi = {
+                        sendMidi(it)
                     }
                 )
             }
@@ -117,6 +123,18 @@ class MainActivity : ComponentActivity() {
         recordingJob?.cancel()
         recordingJob = null
     }
+
+    private fun sendMidi(data: ByteArray) {
+        val sender = ReaStreamSender(
+            identifier = "android",
+            sampleRate = 0,
+            channels = 0,
+            remoteHost = remoteHost.value,
+        )
+         lifecycleScope.launch {
+            sender.send(data)
+        }
+    }
 }
 
 @Composable
@@ -126,6 +144,7 @@ fun SenderScreen(
     onChangeRemoteHost: (String) -> Unit,
     onStart: () -> Unit = {},
     onStop: () -> Unit = {},
+    onSendMidi: (ByteArray) -> Unit = {},
 ) {
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -153,6 +172,19 @@ fun SenderScreen(
                     Text("Start sending")
 
                 }
+            }
+
+            val coroutineScope = rememberCoroutineScope()
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        onSendMidi(byteArrayOf(0x90.toByte(), 60, 127))
+                        delay(1000)
+                        onSendMidi(byteArrayOf(0x80.toByte(), 60, 0))
+                    }
+                },
+            ) {
+                Text("Send MIDI event")
             }
         }
     }
