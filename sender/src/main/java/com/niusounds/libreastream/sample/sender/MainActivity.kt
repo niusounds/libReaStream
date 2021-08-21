@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.niusounds.libreastream.sender.AudioRecordInput
-import com.niusounds.libreastream.sender.KtorUdpSender
 import com.niusounds.libreastream.sender.ReaStreamSender
 import com.niusounds.libreastream.sender.deInterleave
 import kotlinx.coroutines.Dispatchers
@@ -77,32 +76,33 @@ class MainActivity : ComponentActivity() {
         recording.value = true
 
         recordingJob = lifecycleScope.launchWhenStarted {
-            withContext(Dispatchers.IO) {
-                val input = AudioRecordInput(
-                    sampleRate = sampleRate,
-                    channels = channels,
-                )
-                val sender = ReaStreamSender(
-                    identifier = "android",
-                    sampleRate = sampleRate,
-                    channels = channels,
-                    sender = KtorUdpSender(
-                        host = "192.168.86.79"
-                    )
-                )
+            val input = AudioRecordInput(
+                sampleRate = sampleRate,
+                channels = channels,
+            )
+            val sender = ReaStreamSender(
+                identifier = "android",
+                sampleRate = sampleRate,
+                channels = channels,
+                remoteHost = "192.168.86.79",
+            )
 
-                input.readAudio()
-                    // ReaStream uses non-interleaved arrangement
-                    .map { it.deInterleave(channels = channels) }
-                    .collect { audioData ->
-                        try {
-                            sender.send(audioData)
-                        } catch (e: Exception) {
-                            Log.e("Sender", "Error: $e")
-                            stopRecording()
-                        }
+            input.readAudio()
+                // ReaStream uses non-interleaved arrangement
+                .map { it.deInterleave(channels = channels) }
+                .collect { audioData ->
+                    try {
+                        sender.send(audioData)
+                    } catch (e: Exception) {
+                        Log.e("Sender", "Error: $e")
+                        stopRecording()
+                        Toast.makeText(
+                            applicationContext,
+                            "Stopped because error $e",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
-            }
+                }
         }
     }
 
