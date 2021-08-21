@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import org.junit.Assert
 import org.junit.Test

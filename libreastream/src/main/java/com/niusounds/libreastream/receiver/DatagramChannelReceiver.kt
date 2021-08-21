@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import android.util.Log
 import kotlinx.coroutines.ExperimentalCoroutinesApi

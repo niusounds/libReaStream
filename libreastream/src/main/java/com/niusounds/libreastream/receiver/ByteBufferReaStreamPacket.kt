@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import java.nio.ByteBuffer
 import kotlin.math.min

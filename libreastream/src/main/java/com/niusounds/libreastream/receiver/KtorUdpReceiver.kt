@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*

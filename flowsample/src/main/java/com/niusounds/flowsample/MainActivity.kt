@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.niusounds.flowsample.databinding.ActivityMainBinding
-import com.niusounds.libreastream.flow.AudioTrackOutput
-import com.niusounds.libreastream.flow.receiveReaStream
+import com.niusounds.libreastream.receiver.AudioTrackOutput
+import com.niusounds.libreastream.receiver.receiveReaStream
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter

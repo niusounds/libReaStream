@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import kotlinx.coroutines.flow.Flow
 import java.nio.ByteBuffer

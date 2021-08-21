@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.flow
+package com.niusounds.libreastream.receiver
 
 import com.niusounds.libreastream.ReaStream
 import kotlinx.coroutines.CoroutineScope
