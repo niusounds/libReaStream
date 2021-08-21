@@ -25,6 +25,6 @@ class KtorUdpSender(
     }
 
     override suspend fun send(data: ByteBuffer) = withContext(ioContext) {
-        client.send(Datagram(ByteReadPacket(data), NetworkAddress(host, port)))
+        client.send(Datagram(ByteReadPacket(data), client.remoteAddress))
     }
 }
