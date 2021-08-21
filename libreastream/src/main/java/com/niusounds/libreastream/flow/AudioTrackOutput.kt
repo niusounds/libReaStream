@@ -28,7 +28,7 @@ class AudioTrackOutput(
         val channelMask = when (channels) {
             1 -> AudioFormat.CHANNEL_OUT_MONO
             2 -> AudioFormat.CHANNEL_OUT_STEREO
-            else -> throw IllegalStateException("unsupported channels")
+            else -> error("unsupported channels")
         }
         val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
             sampleRate,
