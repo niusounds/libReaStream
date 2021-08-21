@@ -12,6 +12,7 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import kotlin.concurrent.thread
 
+@Deprecated("KtorUdpReceiver is recommended implementation")
 class DatagramChannelReceiver(
     private val port: Int,
     private val bufferSize: Int,

@@ -10,6 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.concurrent.thread
 
+@Deprecated("KtorUdpReceiver is recommended implementation")
 class DatagramSocketReceiver(
     private val port: Int,
     private val bufferSize: Int,
