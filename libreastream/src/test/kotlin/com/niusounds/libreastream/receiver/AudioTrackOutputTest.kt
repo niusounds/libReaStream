@@ -16,9 +16,17 @@ import org.junit.Test
 import kotlin.random.Random
 
 class AudioTrackOutputTest {
+    private lateinit var mockFactory: AudioTrackFactory
+    private lateinit var mockAudioTrack: AudioTrack
+
     @Before
     fun setup() {
+        mockFactory = mockk()
+        mockAudioTrack = mockk(relaxed = true)
+        every { mockFactory.create(any(), any(), any()) } returns mockAudioTrack
+
         mockkStatic(AudioTrack::class)
+        every { AudioTrack.getMinBufferSize(any(), any(), any()) } returns 42
     }
 
     @After
@@ -31,13 +39,20 @@ class AudioTrackOutputTest {
             range.all { i -> it[i] == expected[i] }
         }
 
+    private fun FloatArray.asReaStreamPacket(
+        sampleRate: Int = 44100,
+        channels: Int = 1,
+    ): ReaStreamPacket =
+        ByteBufferReaStreamPacket(
+            AudioDataSerializer(
+                identifier = "test",
+                sampleRate = sampleRate,
+                channels = channels,
+            ).toByteBuffer(this)
+        )
+
     @Test
     fun testPlay() {
-        val mockFactory = mockk<AudioTrackFactory>()
-        val mockAudioTrack = mockk<AudioTrack>(relaxed = true)
-        every { AudioTrack.getMinBufferSize(any(), any(), any()) } returns 42
-        every { mockFactory.create(any(), any(), any()) } returns mockAudioTrack
-
         val audioTrackOutput = AudioTrackOutput(
             sampleRate = 44100,
             channels = 1,
@@ -45,14 +60,8 @@ class AudioTrackOutputTest {
             audioTrackFactory = mockFactory,
         )
 
-        val serializer = AudioDataSerializer(
-            identifier = "test",
-            sampleRate = 44100,
-            channels = 1,
-        )
         val testAudioData = FloatArray(100) { Random.nextFloat() }
-        val testReaStreamPacket = ByteBufferReaStreamPacket(serializer.toByteBuffer(testAudioData))
-        val testPacketFlow = flowOf(testReaStreamPacket)
+        val testPacketFlow = flowOf(testAudioData.asReaStreamPacket())
 
         runBlocking {
             audioTrackOutput.play(testPacketFlow)
@@ -62,6 +71,37 @@ class AudioTrackOutputTest {
                     partial(testAudioData, testAudioData.indices),
                     0,
                     testAudioData.size,
+                    any()
+                )
+            }
+            verify { mockAudioTrack.release() }
+        }
+    }
+
+    @Test
+    fun testChannelMonoToStereo() {
+        val audioTrackOutput = AudioTrackOutput(
+            sampleRate = 44100,
+            channels = 2,
+            bufferScaleFactor = 1,
+            audioTrackFactory = mockFactory,
+        )
+
+        // input mono audio
+        val testAudioData = FloatArray(100) { Random.nextFloat() }
+        // mono -> stereo converted
+        val expectedAudioData = testAudioData.flatMap { listOf(it, it) }.toFloatArray()
+
+        val testPacketFlow = flowOf(testAudioData.asReaStreamPacket())
+
+        runBlocking {
+            audioTrackOutput.play(testPacketFlow)
+            verify { mockAudioTrack.play() }
+            verify {
+                mockAudioTrack.write(
+                    partial(expectedAudioData, expectedAudioData.indices),
+                    0,
+                    expectedAudioData.size,
                     any()
                 )
             }
