@@ -11,32 +11,13 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 
-/**
- * Output [ReaStreamPacket] audio data to device's speaker.
- * [sampleRate] must be the same with ReaStream sender. Re-sampling is not supported.
- * Recommend to use same [channels] with ReaStream sender.
- *
- * [bufferScaleFactor] is scale factor for AudioTrack.getMinBufferSize.
- * Use large value for stable playing but requires more memory.
- */
-class AudioTrackOutput(
-    private val sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE,
-    private val channels: Int = 2,
-    private val bufferScaleFactor: Int = 4,
-) {
-    suspend fun play(flow: Flow<ReaStreamPacket>) {
-        val channelMask = when (channels) {
-            1 -> AudioFormat.CHANNEL_OUT_MONO
-            2 -> AudioFormat.CHANNEL_OUT_STEREO
-            else -> error("unsupported channels")
-        }
-        val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
-            sampleRate,
-            channelMask,
-            AudioFormat.ENCODING_PCM_FLOAT
-        ).coerceAtLeast(ReaStreamPacket.MAX_BLOCK_LENGTH * Float.SIZE_BYTES)
+interface AudioTrackFactory {
+    fun create(sampleRate: Int, channelMask: Int, bufferSize: Int): AudioTrack
+}
 
-        val track = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+private class DefaultAudioTrackFactory : AudioTrackFactory {
+    override fun create(sampleRate: Int, channelMask: Int, bufferSize: Int): AudioTrack {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             AudioTrack.Builder()
                 .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
                 .setBufferSizeInBytes(bufferSize)
@@ -58,6 +39,36 @@ class AudioTrackOutput(
                 AudioTrack.MODE_STREAM,
             )
         }
+    }
+}
+
+/**
+ * Output [ReaStreamPacket] audio data to device's speaker.
+ * [sampleRate] must be the same with ReaStream sender. Re-sampling is not supported.
+ * Recommend to use same [channels] with ReaStream sender.
+ *
+ * [bufferScaleFactor] is scale factor for AudioTrack.getMinBufferSize.
+ * Use large value for stable playing but requires more memory.
+ */
+class AudioTrackOutput(
+    private val sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE,
+    private val channels: Int = 2,
+    private val bufferScaleFactor: Int = 4,
+    private val audioTrackFactory: AudioTrackFactory = DefaultAudioTrackFactory(),
+) {
+    suspend fun play(flow: Flow<ReaStreamPacket>) {
+        val channelMask = when (channels) {
+            1 -> AudioFormat.CHANNEL_OUT_MONO
+            2 -> AudioFormat.CHANNEL_OUT_STEREO
+            else -> error("unsupported channels")
+        }
+        val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
+            sampleRate,
+            channelMask,
+            AudioFormat.ENCODING_PCM_FLOAT
+        ).coerceAtLeast(ReaStreamPacket.MAX_BLOCK_LENGTH * Float.SIZE_BYTES)
+
+        val track = audioTrackFactory.create(sampleRate, channelMask, bufferSize)
         track.play()
 
         val audioData = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
