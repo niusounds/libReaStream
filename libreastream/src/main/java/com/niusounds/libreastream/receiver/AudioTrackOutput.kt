@@ -4,7 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import com.niusounds.libreastream.ReaStream
-import com.niusounds.libreastream.getInterleavedAudioData
+import com.niusounds.libreastream.sender.interleaved
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -86,16 +86,14 @@ class AudioTrackOutput(
                             // Interleave samples
                             // [left-s1, left-s2, left-s3, ..., left-sN, right-s1, right-s2, right-s3, ..., right-sN]
                             // -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ..., left-sN, right-sN]
-                            getInterleavedAudioData(
-                                audioData,
-                                audioDataLength,
-                                channels,
-                                convertedSamples,
+                            val interleaved = audioData.interleaved(
+                                channels = 2,
+                                length = audioDataLength,
                             )
                             track.write(
-                                convertedSamples,
+                                interleaved,
                                 0,
-                                audioDataLength,
+                                interleaved.size,
                                 AudioTrack.WRITE_BLOCKING
                             )
                         } else {

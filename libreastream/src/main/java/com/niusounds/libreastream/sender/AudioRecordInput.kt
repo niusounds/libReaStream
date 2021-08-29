@@ -71,3 +71,19 @@ fun FloatArray.deInterleave(channels: Int): FloatArray {
 
     return result
 }
+
+/**
+ * Non-Interleaved audio data to Interleaved audio data.
+ */
+fun FloatArray.interleaved(channels: Int, length: Int = size): FloatArray {
+    val result = FloatArray(length)
+    val samplesPerChannel = length / channels
+
+    repeat(samplesPerChannel) { i ->
+        repeat(channels) { ch ->
+            result[i * channels + ch] = get(samplesPerChannel * ch + i)
+        }
+    }
+
+    return result
+}
