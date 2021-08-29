@@ -1,4 +1,4 @@
-package com.niusounds.libreastream.sender
+package com.niusounds.libreastream.ktx
 
 import org.junit.Assert
 import org.junit.Test

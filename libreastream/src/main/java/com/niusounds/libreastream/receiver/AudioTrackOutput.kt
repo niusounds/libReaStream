@@ -4,7 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import com.niusounds.libreastream.ReaStream
-import com.niusounds.libreastream.sender.interleaved
+import com.niusounds.libreastream.ktx.interleaved
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
