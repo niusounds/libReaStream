@@ -31,7 +31,7 @@ class MidiDataSerializerTest {
             listOf(
                 MidiEvent(
                     type = 1,
-                    byteSize = 30,
+                    byteSize = 24,
                     sampleFramesSinceLastEvent = 0,
                     flags = 0,
                     noteLength = 0,
