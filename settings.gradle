@@ -1,1 +1,4 @@
-include ':libreastream', ':midisample', ':flowsample', ':sender'
+include ':libreastream'
+include ':samples:midisample'
+include ':samples:flowsample'
+include ':samples:sender'
