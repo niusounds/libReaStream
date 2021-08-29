@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/niusounds/libReaStream.svg)](https://jitpack.io/#niusounds/libReaStream)
+
 # libReaStream
 
 Android audio streaming library which can interact with [ReaStream](http://www.reaper.fm/reaplugs/).
