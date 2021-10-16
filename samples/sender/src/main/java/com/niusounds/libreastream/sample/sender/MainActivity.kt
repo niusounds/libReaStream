@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
             startRecording(
                 sampleRate = 48000,
                 channels = 2,
+                identifier = identifier.value,
             )
         } else {
             Toast.makeText(
@@ -57,17 +58,21 @@ class MainActivity : ComponentActivity() {
 
     private val recording = MutableStateFlow(false)
     private val remoteHost = MutableStateFlow("192.168.86.79")
+    private val identifier = MutableStateFlow("android")
     private var recordingJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val identifier by identifier.collectAsState()
             val sending by recording.collectAsState()
             val host by remoteHost.collectAsState()
             MaterialTheme {
                 SenderScreen(
+                    identifier = identifier,
                     remoteHost = host,
                     sending = sending,
+                    onChangeIdentifier = { this.identifier.value = it },
                     onChangeRemoteHost = { remoteHost.value = it },
                     onStart = {
                         checkPermission.launch(Manifest.permission.RECORD_AUDIO)
@@ -83,7 +88,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startRecording(sampleRate: Int, channels: Int) {
+    private fun startRecording(sampleRate: Int, channels: Int, identifier: String) {
         check(!recording.value) { "startRecording() is called twice" }
         recording.value = true
 
@@ -93,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 channels = channels,
             )
             val sender = ReaStreamSender(
-                identifier = "android",
+                identifier = identifier,
                 sampleRate = sampleRate,
                 channels = channels,
                 remoteHost = remoteHost.value,
@@ -131,7 +136,7 @@ class MainActivity : ComponentActivity() {
             channels = 0,
             remoteHost = remoteHost.value,
         )
-         lifecycleScope.launch {
+        lifecycleScope.launch {
             sender.send(data)
         }
     }
@@ -139,8 +144,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SenderScreen(
+    identifier: String,
     remoteHost: String,
     sending: Boolean,
+    onChangeIdentifier: (String) -> Unit,
     onChangeRemoteHost: (String) -> Unit,
     onStart: () -> Unit = {},
     onStop: () -> Unit = {},
@@ -152,6 +159,11 @@ fun SenderScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            OutlinedTextField(
+                value = identifier,
+                onValueChange = onChangeIdentifier,
+                label = { Text("Identifier") }
+            )
             OutlinedTextField(
                 value = remoteHost,
                 onValueChange = onChangeRemoteHost,
@@ -197,14 +209,20 @@ fun DefaultPreview() {
         mutableStateOf(false)
     }
 
+    var identifier by remember {
+        mutableStateOf("default")
+    }
+
     var host by remember {
         mutableStateOf("")
     }
 
     MaterialTheme {
         SenderScreen(
+            identifier = identifier,
             remoteHost = host,
             sending = sending,
+            onChangeIdentifier = { identifier = it },
             onChangeRemoteHost = { host = it },
             onStart = { sending = true },
             onStop = { sending = false },
