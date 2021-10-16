@@ -1,3 +1,5 @@
+rootProject.name = 'libReaStream'
+
 include ':libreastream'
 include ':samples:midisample'
 include ':samples:flowsample'

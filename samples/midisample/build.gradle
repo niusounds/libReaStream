@@ -1,22 +1,10 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
+    id 'sample.conventions'
 }
 
 android {
-    compileSdkVersion 31
     defaultConfig {
         applicationId 'com.niusounds.libreastream.midisample'
-        minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
     }
     buildFeatures {
         viewBinding true
@@ -25,6 +13,5 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation project(':libreastream')
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 }
