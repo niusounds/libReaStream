@@ -56,9 +56,10 @@ class AudioRecordInput(
             record.startRecording()
 
             try {
+                val audioDataSize = chunkSize
                 while (!Thread.interrupted()) {
-                    val audioData = FloatArray(chunkSize)
-                    record.read(audioData, 0, chunkSize, AudioRecord.READ_BLOCKING)
+                    val audioData = FloatArray(audioDataSize)
+                    record.read(audioData, 0, audioDataSize, AudioRecord.READ_BLOCKING)
                     if (trySend(audioData).isClosed) {
                         break
                     }
