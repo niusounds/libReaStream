@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">flowsample</string>
+    <string name="app_name">libReaStream sample</string>
+    <string name="message">1. Launch REAPER\n2. Insert ReaStream to track\n3. Select "Send audio/MIDI"\n4. Set IP:%s</string>
 </resources>
