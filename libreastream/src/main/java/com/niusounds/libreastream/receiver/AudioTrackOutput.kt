@@ -8,138 +8,124 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 
-interface AudioTrackFactory {
-    fun create(sampleRate: Int, channelMask: Int, bufferSize: Int): AudioTrack
-}
-
-private class DefaultAudioTrackFactory : AudioTrackFactory {
-    override fun create(sampleRate: Int, channelMask: Int, bufferSize: Int): AudioTrack {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            AudioTrack.Builder()
-                .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
-                .setBufferSizeInBytes(bufferSize)
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setChannelMask(channelMask)
-                        .setSampleRate(sampleRate)
-                        .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-                        .build()
-                )
-                .build()
-        } else {
-            AudioTrack(
-                AudioManager.STREAM_MUSIC,
-                sampleRate,
-                channelMask,
-                AudioFormat.ENCODING_PCM_FLOAT,
-                bufferSize,
-                AudioTrack.MODE_STREAM,
+private fun defaultAudioTrackFactory(
+    sampleRate: Int,
+    channelMask: Int,
+    bufferSize: Int
+): AudioTrack {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        AudioTrack.Builder()
+            .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
+            .setBufferSizeInBytes(bufferSize)
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setChannelMask(channelMask)
+                    .setSampleRate(sampleRate)
+                    .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                    .build()
             )
-        }
+            .build()
+    } else {
+        AudioTrack(
+            AudioManager.STREAM_MUSIC,
+            sampleRate,
+            channelMask,
+            AudioFormat.ENCODING_PCM_FLOAT,
+            bufferSize,
+            AudioTrack.MODE_STREAM,
+        )
     }
 }
 
-/**
- * Output [ReaStreamPacket] audio data to device's speaker.
- * [sampleRate] must be the same with ReaStream sender. Re-sampling is not supported.
- * Recommend to use same [channels] with ReaStream sender.
- *
- * [bufferScaleFactor] is scale factor for AudioTrack.getMinBufferSize.
- * Use large value for stable playing but requires more memory.
- */
-class AudioTrackOutput(
-    private val sampleRate: Int,
-    private val channels: Int = 2,
-    private val bufferScaleFactor: Int = 4,
-    private val audioTrackFactory: AudioTrackFactory = DefaultAudioTrackFactory(),
+suspend fun Flow<ReaStreamPacket>.play(
+    sampleRate: Int,
+    channels: Int = 2,
+    bufferScaleFactor: Int = 4,
+    audioTrackFactory: (sampleRate: Int, channelMask: Int, bufferSize: Int) -> AudioTrack = ::defaultAudioTrackFactory,
 ) {
-    suspend fun play(flow: Flow<ReaStreamPacket>) {
-        val channelMask = when (channels) {
-            1 -> AudioFormat.CHANNEL_OUT_MONO
-            2 -> AudioFormat.CHANNEL_OUT_STEREO
-            else -> error("unsupported channels")
-        }
-        val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
-            sampleRate,
-            channelMask,
-            AudioFormat.ENCODING_PCM_FLOAT
-        ).coerceAtLeast(ReaStreamPacket.MAX_BLOCK_LENGTH * Float.SIZE_BYTES)
+    val channelMask = when (channels) {
+        1 -> AudioFormat.CHANNEL_OUT_MONO
+        2 -> AudioFormat.CHANNEL_OUT_STEREO
+        else -> error("unsupported channels")
+    }
+    val bufferSize = bufferScaleFactor * AudioTrack.getMinBufferSize(
+        sampleRate,
+        channelMask,
+        AudioFormat.ENCODING_PCM_FLOAT
+    ).coerceAtLeast(ReaStreamPacket.MAX_BLOCK_LENGTH * Float.SIZE_BYTES)
 
-        val track = audioTrackFactory.create(sampleRate, channelMask, bufferSize)
-        track.play()
+    val track = audioTrackFactory(sampleRate, channelMask, bufferSize)
+    track.play()
 
-        val audioData = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
-        val convertedSamples = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
+    val audioData = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
+    val convertedSamples = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
 
-        flow.filter { it.isAudio && it.sampleRate == sampleRate }
-            .onEach {
+    filter { it.isAudio && it.sampleRate == sampleRate }
+        .onCompletion { track.release() }
+        .collect { packet ->
 
-                val channels = it.channels.toInt()
-                val audioDataLength = it.readAudio(audioData)
+            val packetChannels = packet.channels.toInt()
+            val audioDataLength = packet.readAudio(audioData)
 
-                when (channels) {
-                    2 -> {
-                        if (this.channels == 2) {
-                            // Interleave samples
-                            // [left-s1, left-s2, left-s3, ..., left-sN, right-s1, right-s2, right-s3, ..., right-sN]
-                            // -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ..., left-sN, right-sN]
-                            val interleaved = audioData.interleaved(
-                                channels = 2,
-                                length = audioDataLength,
-                            )
-                            track.write(
-                                interleaved,
-                                0,
-                                interleaved.size,
-                                AudioTrack.WRITE_BLOCKING
-                            )
-                        } else {
-                            // Down-mix stereo -> mono
-                            val audioDataLengthMono = audioDataLength / channels
-                            for (i in 0 until audioDataLengthMono) {
-                                var sample = 0f
-                                for (ch in 0 until channels) {
-                                    sample += audioData[ch * audioDataLengthMono + i]
-                                }
-                                convertedSamples[i] = sample / channels
+            when (packetChannels) {
+                2 -> {
+                    if (channels == 2) {
+                        // Interleave samples
+                        // [left-s1, left-s2, left-s3, ..., left-sN, right-s1, right-s2, right-s3, ..., right-sN]
+                        // -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ..., left-sN, right-sN]
+                        val interleaved = audioData.interleaved(
+                            channels = 2,
+                            length = audioDataLength,
+                        )
+                        track.write(
+                            interleaved,
+                            0,
+                            interleaved.size,
+                            AudioTrack.WRITE_BLOCKING
+                        )
+                    } else {
+                        // Down-mix stereo -> mono
+                        val audioDataLengthMono = audioDataLength / packetChannels
+                        for (i in 0 until audioDataLengthMono) {
+                            var sample = 0f
+                            for (ch in 0 until packetChannels) {
+                                sample += audioData[ch * audioDataLengthMono + i]
                             }
-                            track.write(
-                                convertedSamples,
-                                0,
-                                audioDataLengthMono,
-                                AudioTrack.WRITE_BLOCKING
-                            )
+                            convertedSamples[i] = sample / packetChannels
                         }
+                        track.write(
+                            convertedSamples,
+                            0,
+                            audioDataLengthMono,
+                            AudioTrack.WRITE_BLOCKING
+                        )
                     }
-                    1 -> {
-                        if (this.channels == 1) {
-                            track.write(
-                                audioData,
-                                0,
-                                audioDataLength,
-                                AudioTrack.WRITE_BLOCKING
-                            )
-                        } else {
-                            // Convert mono -> stereo
-                            // [s1, s2, s3, ...] -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ...]
-                            for (i in 0 until audioDataLength) {
-                                val baseIndex = i * 2
-                                convertedSamples[baseIndex + 1] = audioData[i]
-                                convertedSamples[baseIndex] = audioData[i]
-                            }
-                            track.write(
-                                convertedSamples,
-                                0,
-                                audioDataLength * 2,
-                                AudioTrack.WRITE_BLOCKING
-                            )
+                }
+                1 -> {
+                    if (channels == 1) {
+                        track.write(
+                            audioData,
+                            0,
+                            audioDataLength,
+                            AudioTrack.WRITE_BLOCKING
+                        )
+                    } else {
+                        // Convert mono -> stereo
+                        // [s1, s2, s3, ...] -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ...]
+                        for (i in 0 until audioDataLength) {
+                            val baseIndex = i * 2
+                            convertedSamples[baseIndex + 1] = audioData[i]
+                            convertedSamples[baseIndex] = audioData[i]
                         }
+                        track.write(
+                            convertedSamples,
+                            0,
+                            audioDataLength * 2,
+                            AudioTrack.WRITE_BLOCKING
+                        )
                     }
                 }
             }
-            .onCompletion { track.release() }
-            .collect()
-    }
+        }
 }
