@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Play received audio
                 launch {
-                    AudioTrackOutput().play(packets)
+                    AudioTrackOutput(sampleRate = 48000).play(packets)
                 }
 
                 // Show received MIDI message

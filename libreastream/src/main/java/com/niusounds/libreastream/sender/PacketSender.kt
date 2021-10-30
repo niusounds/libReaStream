@@ -4,4 +4,5 @@ import java.nio.ByteBuffer
 
 interface PacketSender {
     suspend fun send(data: ByteBuffer)
+    fun close()
 }

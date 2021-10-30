@@ -44,4 +44,6 @@ class ReaStreamSender(
         val bytes = midiSerializer.toByteBuffer(midiData = midiData)
         sender.send(bytes)
     }
+
+    fun close() = sender.close()
 }

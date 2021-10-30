@@ -13,5 +13,8 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation(libs.appcompat)
     implementation(libs.constraintlayout)
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.coroutines.android)
 }

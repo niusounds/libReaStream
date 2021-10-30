@@ -3,7 +3,6 @@ package com.niusounds.libreastream.receiver
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
-import com.niusounds.libreastream.ReaStream
 import com.niusounds.libreastream.ktx.interleaved
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -51,7 +50,7 @@ private class DefaultAudioTrackFactory : AudioTrackFactory {
  * Use large value for stable playing but requires more memory.
  */
 class AudioTrackOutput(
-    private val sampleRate: Int = ReaStream.DEFAULT_SAMPLE_RATE,
+    private val sampleRate: Int,
     private val channels: Int = 2,
     private val bufferScaleFactor: Int = 4,
     private val audioTrackFactory: AudioTrackFactory = DefaultAudioTrackFactory(),

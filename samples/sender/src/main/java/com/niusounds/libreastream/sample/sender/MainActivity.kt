@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
     private val recording = MutableStateFlow(false)
     private val remoteHost = MutableStateFlow("192.168.86.79")
-    private val identifier = MutableStateFlow("android")
+    private val identifier = MutableStateFlow("default")
     private var recordingJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
