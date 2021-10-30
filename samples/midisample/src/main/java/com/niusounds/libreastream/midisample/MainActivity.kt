@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.niusounds.libreastream.MidiCommand
+import com.niusounds.libreastream.ReaStream
 import com.niusounds.libreastream.midiData
 import com.niusounds.libreastream.midisample.databinding.ActivityMainBinding
 import com.niusounds.libreastream.sender.ReaStreamSender
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val sender = ReaStreamSender(
-        identifier = "default",
+        identifier = ReaStream.DEFAULT_IDENTIFIER,
         sampleRate = 48000, // This sample is MIDI only but sampleRate argument is required currently.
         channels = 1,
         remoteHost = "192.168.86.155", // TODO change here

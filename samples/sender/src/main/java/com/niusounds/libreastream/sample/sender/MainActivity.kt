@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.niusounds.libreastream.ReaStream
 import com.niusounds.libreastream.sender.AudioRecordInput
 import com.niusounds.libreastream.sender.ReaStreamSender
 import com.niusounds.libreastream.sender.deInterleave
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
 
     private val recording = MutableStateFlow(false)
     private val remoteHost = MutableStateFlow("192.168.86.79")
-    private val identifier = MutableStateFlow("default")
+    private val identifier = MutableStateFlow(ReaStream.DEFAULT_IDENTIFIER)
     private var recordingJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
