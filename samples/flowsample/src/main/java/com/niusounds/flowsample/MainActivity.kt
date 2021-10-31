@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.niusounds.flowsample.databinding.ActivityMainBinding
-import com.niusounds.libreastream.receiver.AudioTrackOutput
+import com.niusounds.libreastream.receiver.play
 import com.niusounds.libreastream.receiver.receiveReaStream
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Play received audio
                 launch {
-                    AudioTrackOutput().play(packets)
+                    packets.play(sampleRate = 48000)
                 }
 
                 // Show received MIDI message

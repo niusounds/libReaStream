@@ -1,17 +1,23 @@
 package com.niusounds.libreastream.midisample
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.MotionEvent
-import com.niusounds.libreastream.MidiEvent
-import com.niusounds.libreastream.ReaStreamSender
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.niusounds.libreastream.MidiCommand
+import com.niusounds.libreastream.ReaStream
+import com.niusounds.libreastream.midiData
 import com.niusounds.libreastream.midisample.databinding.ActivityMainBinding
-import java.util.concurrent.Executors
+import com.niusounds.libreastream.sender.ReaStreamSender
+import kotlinx.coroutines.launch
 
-class MainActivity : Activity() {
-
-    private val executor = Executors.newSingleThreadExecutor()
-    private val sender = ReaStreamSender()
+class MainActivity : AppCompatActivity() {
+    private val sender = ReaStreamSender(
+        identifier = ReaStream.DEFAULT_IDENTIFIER,
+        sampleRate = 48000, // This sample is MIDI only but sampleRate argument is required currently.
+        channels = 1,
+        remoteHost = "192.168.86.155", // TODO change here
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,23 +40,22 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
-        executor.shutdownNow()
         sender.close()
         super.onDestroy()
     }
 
-    fun noteEvent(motionEvent: MotionEvent, noteNumber: Int): Boolean {
+    private fun noteEvent(motionEvent: MotionEvent, noteNumber: Int): Boolean {
 
         when (motionEvent.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                executor.submit {
-                    sender.send(MidiEvent.create(MidiEvent.NOTE_ON, 0, noteNumber, 100))
+                lifecycleScope.launch {
+                    sender.send(midiData(MidiCommand.NoteOn, 0, noteNumber, 100))
                 }
             }
 
             MotionEvent.ACTION_UP -> {
-                executor.submit {
-                    sender.send(MidiEvent.create(MidiEvent.NOTE_OFF, 0, noteNumber, 0))
+                lifecycleScope.launch {
+                    sender.send(midiData(MidiCommand.NoteOff, 0, noteNumber, 0))
                 }
             }
         }
