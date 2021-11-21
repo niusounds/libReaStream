@@ -30,7 +30,6 @@ android {
 
 dependencies {
     implementation(libs.coroutines.core)
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation(libs.ktor)
     implementation(libs.annotation)
     testImplementation(libs.junit)
