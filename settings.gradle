@@ -6,6 +6,7 @@ dependencyResolutionManagement {
         libs {
             version('kotlin', '1.5.31')
             version('compose', '1.0.4')
+            version('ktor', '1.6.5')
 
             alias('annotation').to('androidx.annotation:annotation:1.2.0')
             alias('core').to('androidx.core:core-ktx:1.6.0')
@@ -15,7 +16,7 @@ dependencyResolutionManagement {
             alias('lifecycle-runtime').to('androidx.lifecycle:lifecycle-runtime-ktx:2.3.1')
             alias('coroutines-core').to('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1')
             alias('coroutines-android').to('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1')
-            alias('ktor').to('io.ktor:ktor-network:1.6.2')
+            alias('ktor').to('io.ktor', 'ktor-network').versionRef('ktor')
             // compose
             alias('compose-ui').to('androidx.compose.ui', 'ui').versionRef('compose')
             alias('compose-ui-tooling').to('androidx.compose.ui', 'ui-tooling').versionRef('compose')
