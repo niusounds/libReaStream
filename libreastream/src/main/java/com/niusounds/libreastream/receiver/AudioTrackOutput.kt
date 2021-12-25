@@ -4,6 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import com.niusounds.libreastream.ktx.interleaved
+import com.niusounds.libreastream.resampler.R8brainFreeSrc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -61,12 +62,40 @@ suspend fun Flow<ReaStreamPacket>.play(
     val audioData = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
     val convertedSamples = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
 
-    filter { it.isAudio && it.sampleRate == sampleRate }
+    // cache resampler per sampleRate
+    val resamplers = mutableMapOf<Int, R8brainFreeSrc>()
+    val resampledAudioDataMap = mutableMapOf<Int, FloatArray>()
+
+    filter { it.isAudio }
         .onCompletion { track.release() }
         .collect { packet ->
 
             val packetChannels = packet.channels.toInt()
-            val audioDataLength = packet.readAudio(audioData)
+
+            // Ensure packet.sampleRate to match to playing sampleRate
+            val (audioData: FloatArray, audioDataLength: Int) = if (packet.sampleRate == sampleRate) {
+                val audioDataLength = packet.readAudio(audioData)
+                Pair(audioData, audioDataLength)
+            } else {
+                // sample rate conversion
+                val resampler = resamplers.getOrPut(packet.sampleRate) {
+                    R8brainFreeSrc(
+                        srcSampleRate = packet.sampleRate.toDouble(),
+                        dstSampleRate = sampleRate.toDouble(),
+                        maxInLen = ReaStreamPacket.MAX_BLOCK_LENGTH / ReaStreamPacket.PER_SAMPLE_BYTES,
+                    )
+                }
+                val audioDataLength = packet.readAudio(audioData)
+                val resampledAudioData = resampledAudioDataMap.getOrPut(packet.sampleRate) {
+                    FloatArray(resampler.getMaxOutLen())
+                }
+                val resampledAudioDataLength = resampler.process(
+                    input = audioData,
+                    len = audioDataLength,
+                    output = resampledAudioData,
+                )
+                Pair(resampledAudioData, resampledAudioDataLength)
+            }
 
             when (packetChannels) {
                 2 -> {
