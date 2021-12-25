@@ -6,6 +6,7 @@ import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import kotlin.random.Random
@@ -45,6 +46,50 @@ class AudioTrackOutputTest {
                 channels = channels,
             ).toByteBuffer(this)
         )
+
+    @Test
+    fun testReadAudio() {
+
+        // ReaStream packet stereo audio (non-interleaved)
+        val testAudioData = floatArrayOf(
+            // L
+            0.1f, 0.2f, 0.3f,
+            // R
+            0.4f, 0.5f, 0.6f,
+        )
+
+        val packet = testAudioData.asReaStreamPacket(channels = 2)
+        val audioData = FloatArray(testAudioData.size)
+        packet.readAudio(audioData)
+
+        Assert.assertArrayEquals(testAudioData, audioData, 0.001f)
+    }
+
+    @Test
+    fun testReadAudioInterleaved() {
+
+        // ReaStream packet stereo audio (non-interleaved)
+        val testAudioData = floatArrayOf(
+            // L
+            0.1f, 0.2f, 0.3f,
+            // R
+            0.4f, 0.5f, 0.6f,
+        )
+
+        // written stereo audio (interleaved)
+        val expectedAudioData = floatArrayOf(
+            // L, R
+            0.1f, 0.4f,
+            0.2f, 0.5f,
+            0.3f, 0.6f,
+        )
+
+        val packet = testAudioData.asReaStreamPacket(channels = 2)
+        val audioData = FloatArray(testAudioData.size)
+        packet.readAudioInterleaved(audioData)
+
+        Assert.assertArrayEquals(expectedAudioData, audioData, 0.001f)
+    }
 
     @Test
     fun testMonoToMono() {

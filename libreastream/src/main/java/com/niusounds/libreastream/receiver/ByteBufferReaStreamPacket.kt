@@ -72,6 +72,27 @@ internal class ByteBufferReaStreamPacket(private val buffer: ByteBuffer) : ReaSt
         return sizeInFloats
     }
 
+    override fun readAudioInterleaved(out: FloatArray, offset: Int, size: Int): Int {
+        val channels = channels.toInt()
+        if (channels == 1) {
+            return readAudio(out, offset, size)
+        }
+
+        val originalPos = buffer.position()
+        buffer.position(audioDataOffset)
+        val sizeInFloats = min(blockLength.toInt() / ReaStreamPacket.PER_SAMPLE_BYTES, size)
+
+        repeat(channels) { ch ->
+            repeat(sizeInFloats / channels) { i ->
+                val dstIndex = i * channels + ch
+                out[dstIndex] = buffer.float
+            }
+        }
+
+        buffer.position(originalPos)
+        return sizeInFloats
+    }
+
     override val midiEvents: List<MidiEvent>
         get() {
             val originalPos = buffer.position()
