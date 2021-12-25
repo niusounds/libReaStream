@@ -1,0 +1,3 @@
+[submodule "libreastream/src/main/cpp/r8brain-free-src"]
+	path = libreastream/src/main/cpp/r8brain-free-src
+	url = https://github.com/avaneev/r8brain-free-src.git
