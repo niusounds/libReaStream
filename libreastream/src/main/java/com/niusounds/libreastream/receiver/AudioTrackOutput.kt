@@ -3,7 +3,6 @@ package com.niusounds.libreastream.receiver
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
-import com.niusounds.libreastream.ktx.interleaved
 import com.niusounds.libreastream.resampler.R8brainFreeSrc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -74,7 +73,7 @@ suspend fun Flow<ReaStreamPacket>.play(
 
             // Ensure packet.sampleRate to match to playing sampleRate
             val (audioData: FloatArray, audioDataLength: Int) = if (packet.sampleRate == sampleRate) {
-                val audioDataLength = packet.readAudio(audioData)
+                val audioDataLength = packet.readAudioInterleaved(audioData)
                 Pair(audioData, audioDataLength)
             } else {
                 // sample rate conversion
@@ -85,7 +84,7 @@ suspend fun Flow<ReaStreamPacket>.play(
                         maxInLen = ReaStreamPacket.MAX_BLOCK_LENGTH / ReaStreamPacket.PER_SAMPLE_BYTES,
                     )
                 }
-                val audioDataLength = packet.readAudio(audioData)
+                val audioDataLength = packet.readAudioInterleaved(audioData)
                 val resampledAudioData = resampledAudioDataMap.getOrPut(packet.sampleRate) {
                     FloatArray(resampler.getMaxOutLen())
                 }
@@ -100,28 +99,22 @@ suspend fun Flow<ReaStreamPacket>.play(
             when (packetChannels) {
                 2 -> {
                     if (channels == 2) {
-                        // Interleave samples
-                        // [left-s1, left-s2, left-s3, ..., left-sN, right-s1, right-s2, right-s3, ..., right-sN]
-                        // -> [left-s1, right-s1, left-s2, right-s2, left-s3, right-s3, ..., left-sN, right-sN]
-                        val interleaved = audioData.interleaved(
-                            channels = 2,
-                            length = audioDataLength,
-                        )
                         track.write(
-                            interleaved,
+                            audioData,
                             0,
-                            interleaved.size,
+                            audioDataLength,
                             AudioTrack.WRITE_BLOCKING
                         )
                     } else {
                         // Down-mix stereo -> mono
                         val audioDataLengthMono = audioDataLength / packetChannels
-                        for (i in 0 until audioDataLengthMono) {
+                        val factor = 1f / packetChannels.toFloat()
+                        repeat(audioDataLengthMono) { i ->
                             var sample = 0f
-                            for (ch in 0 until packetChannels) {
-                                sample += audioData[ch * audioDataLengthMono + i]
+                            repeat(packetChannels) { ch ->
+                                sample += audioData[ch + i * packetChannels] * factor
                             }
-                            convertedSamples[i] = sample / packetChannels
+                            convertedSamples[i] = sample
                         }
                         track.write(
                             convertedSamples,

@@ -50,6 +50,13 @@ interface ReaStreamPacket {
     fun readAudio(out: FloatArray, offset: Int = 0, size: Int = out.size): Int
 
     /**
+     * Get PCM audio data.
+     * Must be used this only if [isAudio] is true.
+     * Otherwise reads undefined values.
+     */
+    fun readAudioInterleaved(out: FloatArray, offset: Int = 0, size: Int = out.size): Int
+
+    /**
      * Get MIDI event data.
      * Use this only if [isMidi] is true.
      * Otherwise returns undefined values.
