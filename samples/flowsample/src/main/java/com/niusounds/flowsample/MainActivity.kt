@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Play received audio
                 launch {
+                    // automatically resampled when received packet has different sample rate
                     packets.play(sampleRate = 48000)
                 }
 

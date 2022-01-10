@@ -10,7 +10,7 @@ Java_com_niusounds_libreastream_resampler_R8brainFreeSrc_initNative(
         jdouble dstSampleRate,
         jint maxInLen
 ) {
-    return reinterpret_cast<jlong>(new r8b::CDSPResampler(srcSampleRate, dstSampleRate, maxInLen));
+    return reinterpret_cast<jlong>(new r8b::CDSPResampler24(srcSampleRate, dstSampleRate, maxInLen));
 }
 
 extern "C"
