@@ -3,8 +3,7 @@ package com.niusounds.libreastream.receiver
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
-import com.niusounds.libreastream.resampler.R8brainFreeSrc
-import com.niusounds.libreastream.resampler.Resampler
+import com.niusounds.libreastream.resampler.ResamplerManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -62,8 +61,12 @@ suspend fun Flow<ReaStreamPacket>.play(
     val audioData = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
     val convertedSamples = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
 
-    // cache resampler per sampleRate
-    val resamplers = mutableMapOf<Int, Resampler>()
+    val resamplerManager = ResamplerManager(
+        dstSampleRate = sampleRate,
+        maxInLen = ReaStreamPacket.MAX_BLOCK_LENGTH / ReaStreamPacket.PER_SAMPLE_BYTES,
+    )
+
+    // cache resampledAudioData per sample rate
     val resampledAudioDataMap = mutableMapOf<Int, FloatArray>()
 
     filter { it.isAudio }
@@ -78,13 +81,10 @@ suspend fun Flow<ReaStreamPacket>.play(
                 Pair(audioData, audioDataLength)
             } else {
                 // sample rate conversion
-                val resampler = resamplers.getOrPut(packet.sampleRate) {
-                    R8brainFreeSrc(
-                        srcSampleRate = packet.sampleRate.toDouble(),
-                        dstSampleRate = sampleRate.toDouble(),
-                        maxInLen = ReaStreamPacket.MAX_BLOCK_LENGTH / ReaStreamPacket.PER_SAMPLE_BYTES,
-                    )
-                }
+                val resampler = resamplerManager.getResampler(
+                    srcSampleRate = packet.sampleRate,
+                    channel = 0,
+                )
                 val audioDataLength = packet.readAudioInterleaved(audioData)
                 val resampledAudioData = resampledAudioDataMap.getOrPut(packet.sampleRate) {
                     FloatArray(resampler.getMaxOutLen())
