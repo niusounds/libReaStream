@@ -1,17 +1,17 @@
 package com.niusounds.libreastream.resampler
 
-class R8brainFreeSrc(
+internal class R8brainFreeSrc(
     srcSampleRate: Double,
     dstSampleRate: Double,
     maxInLen: Int,
-) {
+) : Resampler {
     private val nativePtr: Long = initNative(srcSampleRate, dstSampleRate, maxInLen)
 
-    fun release() = release(nativePtr)
+    override fun release() = release(nativePtr)
 
     fun getLatency(): Int = getLatency(nativePtr)
     fun getLatencyFrac(): Double = getLatencyFrac(nativePtr)
-    fun getMaxOutLen(): Int = getMaxOutLen(nativePtr)
+    override fun getMaxOutLen(): Int = getMaxOutLen(nativePtr)
     fun clear() = clear(nativePtr)
     fun getInLenBeforeOutStart(): Int = getInLenBeforeOutStart(nativePtr)
     fun process(
@@ -20,7 +20,7 @@ class R8brainFreeSrc(
         output: DoubleArray,
     ): Int = process(nativePtr, input, len, output)
 
-    fun process(
+    override fun process(
         input: FloatArray,
         len: Int,
         output: FloatArray,

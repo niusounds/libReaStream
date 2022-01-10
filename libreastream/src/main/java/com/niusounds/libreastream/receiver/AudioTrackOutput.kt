@@ -4,6 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import com.niusounds.libreastream.resampler.R8brainFreeSrc
+import com.niusounds.libreastream.resampler.Resampler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -62,7 +63,7 @@ suspend fun Flow<ReaStreamPacket>.play(
     val convertedSamples = FloatArray(ReaStreamPacket.MAX_BLOCK_LENGTH * 2)
 
     // cache resampler per sampleRate
-    val resamplers = mutableMapOf<Int, R8brainFreeSrc>()
+    val resamplers = mutableMapOf<Int, Resampler>()
     val resampledAudioDataMap = mutableMapOf<Int, FloatArray>()
 
     filter { it.isAudio }
