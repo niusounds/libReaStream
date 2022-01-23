@@ -1,0 +1,12 @@
+*.iml
+.gradle
+/local.properties
+.DS_Store
+/build
+/captures
+.idea/*
+
+# original project files ignoring on checkout
+buildSrc
+docs
+libreastream
