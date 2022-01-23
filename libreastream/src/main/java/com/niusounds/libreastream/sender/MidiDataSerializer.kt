@@ -24,6 +24,10 @@ class MidiDataSerializer(
         }
     }
 
+    /**
+     * Serializes a MIDI message into [ByteBuffer] which will be parsed into midi event
+     * by remote side ReaStream VST plugin (or libReaStream).
+     */
     fun toByteBuffer(
         sampleFramesSinceLastEvent: Int = 0,
         flags: Int = 0,

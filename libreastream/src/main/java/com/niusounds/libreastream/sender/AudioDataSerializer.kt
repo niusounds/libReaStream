@@ -26,6 +26,12 @@ class AudioDataSerializer(
         }
     }
 
+    /**
+     * Serializes PCM [audioData] into [ByteBuffer] which will be parsed into audio samples
+     * by remote side ReaStream VST plugin (or libReaStream).
+     *
+     * [audioData] must not have length larger than 400.
+     */
     fun toByteBuffer(audioData: FloatArray): ByteBuffer {
         val sblocklen = audioData.size * Float.SIZE_BYTES
 

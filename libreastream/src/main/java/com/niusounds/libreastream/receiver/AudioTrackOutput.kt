@@ -37,6 +37,12 @@ private fun defaultAudioTrackFactory(
     }
 }
 
+/**
+ * Plays received [ReaStreamPacket] with system's default audio output device.
+ * [sampleRate] and [channels] must be equal to received packets.
+ *
+ * [bufferScaleFactor] is used to enlarge [AudioTrack]'s buffer size.
+ */
 suspend fun Flow<ReaStreamPacket>.play(
     sampleRate: Int,
     channels: Int = 2,
