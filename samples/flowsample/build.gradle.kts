@@ -1,13 +1,13 @@
 plugins {
-    id 'sample.conventions'
+    id("sample.conventions")
 }
 
 android {
     defaultConfig {
-        applicationId 'com.niusounds.libreastream.midisample'
+        applicationId = "com.niusounds.flowsample"
     }
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 }
 
