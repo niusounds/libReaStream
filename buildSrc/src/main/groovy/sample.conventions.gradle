@@ -1,10 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-}
-
-repositories {
-    mavenCentral()
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {

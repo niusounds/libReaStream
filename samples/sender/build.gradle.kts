@@ -1,29 +1,20 @@
 plugins {
-    id 'sample.conventions'
+    id("sample.conventions")
 }
 
 android {
     defaultConfig {
-        applicationId "com.niusounds.libreastream.sample.sender"
+        applicationId = "com.niusounds.libreastream.sample.sender"
 
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
-    }
-    kotlinOptions {
-        useIR = true
     }
     buildFeatures {
-        compose true
+        compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.compose.get()
-        kotlinCompilerVersion libs.versions.compose.get()
-    }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
 }
 
