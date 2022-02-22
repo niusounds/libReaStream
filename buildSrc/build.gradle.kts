@@ -1,7 +1,13 @@
 plugins {
-    id("groovy-gradle-plugin")
+    `kotlin-dsl`
 }
 
 repositories {
-    gradlePluginPortal() // so that external plugins can be resolved in dependencies section
+    gradlePluginPortal()
+    google()
+}
+
+dependencies {
+    implementation("com.android.tools.build:gradle:7.1.1")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
 }
