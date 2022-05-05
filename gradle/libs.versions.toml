@@ -2,7 +2,7 @@
 kotlin = "1.6.10"
 compose = "1.1.1"
 # https://ktor.io/changelog/1.6/
-ktor = "1.6.8"
+ktor = "2.0.1"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
 coroutines = "1.6.1"
 
