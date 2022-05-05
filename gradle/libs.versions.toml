@@ -4,7 +4,7 @@ compose = "1.1.1"
 # https://ktor.io/changelog/1.6/
 ktor = "1.6.8"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
-coroutines = "1.6.0"
+coroutines = "1.6.1"
 
 [libraries]
 # https://developer.android.com/jetpack/androidx/releases/annotation
