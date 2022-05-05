@@ -32,6 +32,6 @@ compose-activity = "androidx.activity:activity-compose:1.4.0"
 
 # test
 junit = "junit:junit:4.13.2"
-mockk = "io.mockk:mockk:1.12.0"
+mockk = "io.mockk:mockk:1.12.3"
 androidx-test = "androidx.test.ext:junit:1.1.3"
 espresso = "androidx.test.espresso:espresso-core:3.4.0"
