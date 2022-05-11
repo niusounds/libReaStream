@@ -1,5 +1,7 @@
 [versions]
 kotlin = "1.6.10"
+# https://github.com/Kotlin/dokka/releases
+dokka = "1.6.10"
 compose = "1.1.1"
 # https://ktor.io/changelog/1.6/
 ktor = "1.6.8"
@@ -35,3 +37,6 @@ junit = "junit:junit:4.13.2"
 mockk = "io.mockk:mockk:1.12.4"
 androidx-test = "androidx.test.ext:junit:1.1.3"
 espresso = "androidx.test.espresso:espresso-core:3.4.0"
+
+[plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

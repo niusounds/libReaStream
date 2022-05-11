@@ -2,7 +2,7 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("maven-publish")
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.dokka)
 }
 
 group = "com.github.niusounds"
