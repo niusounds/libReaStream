@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.6.10"
 # https://github.com/Kotlin/dokka/releases
-dokka = "1.6.10"
+dokka = "1.6.21"
 compose = "1.1.1"
 # https://ktor.io/changelog/1.6/
 ktor = "1.6.8"
