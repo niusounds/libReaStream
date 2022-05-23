@@ -1,0 +1,11 @@
+complexity:
+  LongMethod:
+    active: false
+  LongParameterList:
+    active: false
+naming:
+  MatchingDeclarationName:
+    active: true
+style:
+  NewLineAtEndOfFile:
+    active: true

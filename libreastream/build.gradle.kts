@@ -6,6 +6,10 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+detekt {
+    config = files("$rootDir/detekt.yml")
+}
+
 group = "com.github.niusounds"
 version = "0.2.0"
 
