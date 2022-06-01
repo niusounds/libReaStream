@@ -1,12 +1,12 @@
 [versions]
-kotlin = "1.6.10"
+kotlin = "1.6.21"
 # https://github.com/Kotlin/dokka/releases
 dokka = "1.6.21"
-compose = "1.1.1"
+compose = "1.2.0-beta02"
 # https://ktor.io/changelog/1.6/
 ktor = "1.6.8"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
-coroutines = "1.6.1"
+coroutines = "1.6.2"
 
 [libraries]
 # https://developer.android.com/jetpack/androidx/releases/annotation
@@ -16,9 +16,9 @@ core = "androidx.core:core-ktx:1.7.0"
 # https://developer.android.com/jetpack/androidx/releases/appcompat
 appcompat = "androidx.appcompat:appcompat:1.4.1"
 # https://developer.android.com/jetpack/androidx/releases/constraintlayout
-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.3"
+constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 # https://github.com/material-components/material-components-android/releases
-material = "com.google.android.material:material:1.6.0"
+material = "com.google.android.material:material:1.6.1"
 # https://developer.android.com/jetpack/androidx/releases/lifecycle
 lifecycle-runtime = "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
