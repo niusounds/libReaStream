@@ -9,10 +9,10 @@ group = "com.github.niusounds"
 version = "0.2.0"
 
 android {
-    compileSdk = 31
+    compileSdk = 32
     defaultConfig {
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 32
     }
     buildTypes {
         release {
