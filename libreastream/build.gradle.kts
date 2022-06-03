@@ -3,6 +3,11 @@ plugins {
     id("kotlin-android")
     id("maven-publish")
     alias(libs.plugins.dokka)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config = files("$rootDir/detekt.yml")
 }
 
 group = "com.github.niusounds"

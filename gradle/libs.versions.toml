@@ -7,6 +7,8 @@ compose = "1.2.0-beta02"
 ktor = "1.6.8"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
 coroutines = "1.6.2"
+# https://github.com/detekt/detekt/releases
+detekt = "1.20.0"
 
 [libraries]
 # https://developer.android.com/jetpack/androidx/releases/annotation
@@ -40,3 +42,4 @@ espresso = "androidx.test.espresso:espresso-core:3.4.0"
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
