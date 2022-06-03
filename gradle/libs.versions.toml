@@ -2,7 +2,7 @@
 kotlin = "1.6.21"
 # https://github.com/Kotlin/dokka/releases
 dokka = "1.6.21"
-compose = "1.2.0-beta02"
+compose = "1.2.0-beta03"
 # https://ktor.io/changelog/1.6/
 ktor = "1.6.8"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
