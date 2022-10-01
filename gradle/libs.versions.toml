@@ -31,7 +31,7 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = 
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-activity = "androidx.activity:activity-compose:1.5.1"
+compose-activity = "androidx.activity:activity-compose:1.6.0"
 
 # test
 junit = "junit:junit:4.13.2"
