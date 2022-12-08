@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.7.20"
-compose = "1.3.1"
+compose-bom = "2022.11.00"
 composeCompiler = "1.3.2"
 # https://ktor.io/changelog/1.6/
 ktor = "2.2.1"
@@ -26,11 +26,12 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 ktor = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-material = { module = "androidx.compose.material:material" }
 compose-activity = "androidx.activity:activity-compose:1.6.1"
 
 # test
