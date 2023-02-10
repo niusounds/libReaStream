@@ -1,7 +1,7 @@
 [versions]
-kotlin = "1.7.20"
+kotlin = "1.8.10"
 compose-bom = "2023.01.00"
-composeCompiler = "1.3.2"
+composeCompiler = "1.4.2"
 # https://ktor.io/changelog/1.6/
 ktor = "2.2.3"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
