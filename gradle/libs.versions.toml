@@ -21,7 +21,7 @@ constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 # https://github.com/material-components/material-components-android/releases
 material = "com.google.android.material:material:1.8.0"
 # https://developer.android.com/jetpack/androidx/releases/lifecycle
-lifecycle-runtime = "androidx.lifecycle:lifecycle-runtime-ktx:2.6.0"
+lifecycle-runtime = "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 ktor = { module = "io.ktor:ktor-network", version.ref = "ktor" }
