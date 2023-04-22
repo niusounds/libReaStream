@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace = "com.niusounds.flowsample"
     defaultConfig {
         applicationId = "com.niusounds.flowsample"
     }

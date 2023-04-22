@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace = "com.niusounds.libreastream.sample.sender"
     defaultConfig {
         applicationId = "com.niusounds.libreastream.sample.sender"
 

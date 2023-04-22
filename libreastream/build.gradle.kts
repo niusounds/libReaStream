@@ -13,6 +13,7 @@ group = "com.github.niusounds"
 version = "0.2.0"
 
 android {
+    namespace = "com.niusounds.libreastream"
     compileSdk = 32
     defaultConfig {
         minSdk = 21
