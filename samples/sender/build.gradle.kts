@@ -29,9 +29,5 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.lifecycle.runtime)
     implementation(libs.compose.activity)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test)
-    androidTestImplementation(libs.espresso)
-    androidTestImplementation(libs.compose.ui.test)
     debugImplementation(libs.compose.ui.tooling)
 }
