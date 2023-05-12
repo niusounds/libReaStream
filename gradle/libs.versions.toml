@@ -5,7 +5,7 @@ composeCompiler = "1.4.7"
 # https://ktor.io/docs/releases.html
 ktor = "2.3.0"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
-coroutines = "1.7.0"
+coroutines = "1.7.1"
 # https://github.com/detekt/detekt/releases
 detekt = "1.22.0"
 
