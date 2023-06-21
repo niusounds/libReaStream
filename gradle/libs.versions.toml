@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.8.21"
-compose-bom = "2023.06.00"
+compose-bom = "2023.06.01"
 composeCompiler = "1.4.7"
 # https://ktor.io/docs/releases.html
 ktor = "2.3.1"
