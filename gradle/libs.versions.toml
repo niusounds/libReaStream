@@ -2,7 +2,7 @@
 compose-bom = "2023.08.00"
 composeCompiler = "1.5.1"
 # https://ktor.io/docs/releases.html
-ktor = "2.3.3"
+ktor = "2.3.4"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
 coroutines = "1.7.3"
 # https://github.com/detekt/detekt/releases
