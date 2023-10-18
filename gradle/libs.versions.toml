@@ -1,5 +1,5 @@
 [versions]
-compose-bom = "2023.10.00"
+compose-bom = "2023.10.01"
 composeCompiler = "1.5.1"
 # https://ktor.io/docs/releases.html
 ktor = "2.3.5"
