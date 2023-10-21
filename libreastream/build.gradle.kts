@@ -14,10 +14,9 @@ version = "0.2.0"
 
 android {
     namespace = "com.niusounds.libreastream"
-    compileSdk = 32
+    compileSdk = 34
     defaultConfig {
         minSdk = 21
-        targetSdk = 32
     }
     buildTypes {
         release {
