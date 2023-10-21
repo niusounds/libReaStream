@@ -14,10 +14,9 @@ version = "0.2.0"
 
 android {
     namespace = "com.niusounds.libreastream"
-    compileSdk = 32
+    compileSdk = 34
     defaultConfig {
         minSdk = 21
-        targetSdk = 32
     }
     buildTypes {
         release {
@@ -29,11 +28,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 
