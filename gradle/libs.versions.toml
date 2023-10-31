@@ -6,7 +6,7 @@ ktor = "2.3.5"
 # https://github.com/Kotlin/kotlinx.coroutines/releases
 coroutines = "1.7.3"
 # https://github.com/detekt/detekt/releases
-detekt = "1.23.2"
+detekt = "1.23.3"
 
 [libraries]
 # https://developer.android.com/jetpack/androidx/releases/annotation
